@@ -52,7 +52,7 @@
 		}
 	},
 	"name": "Asynchronous Python API for MelCloud",
-	"image": "mcr.microsoft.com/devcontainers/python:1-3.12-bullseye",
+	"image": "mcr.microsoft.com/vscode/devcontainers/python:3.12",
 	"features": {
 		"ghcr.io/devcontainers-contrib/features/poetry:2": {},
 		"ghcr.io/devcontainers/features/github-cli:1": {},
