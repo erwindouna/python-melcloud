@@ -4,8 +4,10 @@ import os
 
 import pytest
 from unittest.mock import AsyncMock, Mock, patch
-from pymelcloud import DEVICE_TYPE_ERV
-from pymelcloud.erv_device import (
+
+import src.pymelcloud
+from src.pymelcloud import DEVICE_TYPE_ERV
+from src.pymelcloud.erv_device import (
     VENTILATION_MODE_AUTO,
     VENTILATION_MODE_BYPASS,
     VENTILATION_MODE_RECOVERY,
@@ -21,7 +23,7 @@ def _build_device(device_conf_name: str, device_state_name: str) -> ErvDevice:
     with open(os.path.join(test_dir, device_state_name), "r") as json_file:
         device_state = json.load(json_file)
 
-    with patch("pymelcloud.client.Client") as _client:
+    with patch("src.pymelcloud.client.Client") as _client:
         _client.update_confs = AsyncMock()
         _client.device_confs.__iter__ = Mock(return_value=[device_conf].__iter__())
         _client.fetch_device_units = AsyncMock(return_value=[])

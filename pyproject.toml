@@ -18,7 +18,7 @@ license = "MIT"
 maintainers = ["Erwin Douna <e.douna@gmail.com>"]
 packages = [{ include = "pymelcloud", from = "src" }]
 readme = "README.md"
-repository = "https://github.com/erwindouna/python-tado"
+repository = "https://github.com/erwindouna/python-melcloud"
 
 [tool.poetry.dependencies]
 aiohttp = ">=3.0.0"
@@ -29,8 +29,8 @@ yarl = ">=1.6.0"
 aioresponses = "^0.7.6"
 
 [tool.poetry.urls]
-"Bug Tracker" = "https://github.com/erwindouna/python-tado/issues"
-Changelog = "https://github.com/erwindouna/python-tado/releases"
+"Bug Tracker" = "https://github.com/erwindouna/python-melcloud/issues"
+Changelog = "https://github.com/erwindouna/python-melcloud/releases"
 
 [tool.poetry.group.dev.dependencies]
 aresponses = "3.0.0"
@@ -56,7 +56,7 @@ show_missing = true
 
 [tool.coverage.run]
 plugins = ["covdefaults"]
-source = ["tadoasync"]
+source = ["src/pymelcloud"]
 
 [tool.mypy]
 # Specify the target platform details in config, so your developers are

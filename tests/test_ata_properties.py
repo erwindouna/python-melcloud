@@ -5,9 +5,11 @@ import os
 import pytest
 from unittest.mock import AsyncMock, Mock, patch
 from aiohttp.web import HTTPForbidden
-from pymelcloud import DEVICE_TYPE_ATA
-from pymelcloud.const import ACCESS_LEVEL
-from pymelcloud.ata_device import (
+from src.pymelcloud import DEVICE_TYPE_ATA
+
+import src.pymelcloud
+from src.pymelcloud.const import ACCESS_LEVEL
+from src.pymelcloud.ata_device import (
     OPERATION_MODE_HEAT,
     OPERATION_MODE_DRY,
     OPERATION_MODE_COOL,
@@ -42,7 +44,7 @@ def _build_device(device_conf_name: str, device_state_name: str) -> AtaDevice:
     with open(os.path.join(test_dir, device_state_name), "r") as json_file:
         device_state = json.load(json_file)
 
-    with patch("pymelcloud.client.Client") as _client:
+    with patch("src.pymelcloud.client.Client") as _client:
         _client.update_confs = AsyncMock()
         _client.device_confs.__iter__ = Mock(return_value=[device_conf].__iter__())
         _client.fetch_device_units = AsyncMock(return_value=[])
