@@ -120,6 +120,3 @@ node_modules/
 
 # Deepcode AI
 .dccache
-
-# Example dev
-examples/example_dev.py

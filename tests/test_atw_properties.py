@@ -1,7 +1,9 @@
 """Ecodan tests."""
 import pytest
-from pymelcloud import DEVICE_TYPE_ATW
-from pymelcloud.atw_device import (
+
+import src.pymelcloud
+from src.pymelcloud import DEVICE_TYPE_ATW
+from src.pymelcloud.atw_device import (
     OPERATION_MODE_AUTO,
     OPERATION_MODE_FORCE_HOT_WATER,
     STATUS_HEAT_WATER,

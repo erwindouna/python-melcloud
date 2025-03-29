@@ -1,0 +1,173 @@
+[tool.poetry]
+name = "python-melcloud"
+version = "0.1.0"
+authors = ["Erwin Douna <e.douna@gmail.com>"]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Framework :: AsyncIO",
+  "Intended Audience :: Developers",
+  "Natural Language :: English",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+]
+description = "Asynchronous Python client for controlling Melcloud devices."
+documentation = "https://github.com/erwindouna/python-melcloud"
+homepage = "https://github.com/erwindouna/python-melcloud"
+keywords = ["melcloud", "homeassistant", "api", "async", "client"]
+license = "MIT"
+maintainers = ["Erwin Douna <e.douna@gmail.com>"]
+packages = [{ include = "pymelcloud", from = "src" }]
+readme = "README.md"
+repository = "https://github.com/erwindouna/python-melcloud"
+
+[tool.poetry.dependencies]
+aiohttp = ">=3.0.0"
+mashumaro = ">=3.10"
+orjson = ">=3.9.8"
+python = "^3.12"
+yarl = ">=1.6.0"
+aioresponses = "^0.7.6"
+
+[tool.poetry.urls]
+"Bug Tracker" = "https://github.com/erwindouna/python-melcloud/issues"
+Changelog = "https://github.com/erwindouna/python-melcloud/releases"
+
+[tool.poetry.group.dev.dependencies]
+aresponses = "3.0.0"
+codespell = "2.4.1"
+covdefaults = "2.3.0"
+coverage = { version = "7.7.1", extras = ["toml"] }
+mypy = "1.15.0"
+pre-commit = "4.2.0"
+pre-commit-hooks = "5.0.0"
+pylint = "3.3.6"
+pytest = "8.3.5"
+pytest-asyncio = "0.26.0"
+pytest-cov = "6.0.0"
+ruff = "0.11.2"
+safety = "3.3.1"
+yamllint = "1.37.0"
+syrupy = "4.9.1"
+deptry = "0.23.0"
+asynctest = "^0.13.0"  # Consider removing if unused
+
+[tool.coverage.report]
+show_missing = true
+
+[tool.coverage.run]
+plugins = ["covdefaults"]
+source = ["pymelcloud"]
+
+[tool.mypy]
+# Specify the target platform details in config, so your developers are
+# free to run mypy on Windows, Linux, or macOS and get consistent
+# results.
+platform = "linux"
+python_version = "3.12"
+
+# show error messages from unrelated files
+follow_imports = "normal"
+
+# suppress errors about unsatisfied imports
+ignore_missing_imports = true
+
+# be strict
+check_untyped_defs = true
+disallow_any_generics = true
+disallow_incomplete_defs = true
+disallow_subclassing_any = true
+disallow_untyped_calls = true
+disallow_untyped_decorators = true
+disallow_untyped_defs = true
+no_implicit_optional = true
+strict_optional = true
+warn_incomplete_stub = true
+warn_no_return = true
+warn_redundant_casts = true
+warn_return_any = true
+warn_unused_configs = true
+warn_unused_ignores = true
+
+[tool.pylint.MASTER]
+ignore = ["tests"]
+
+[tool.pylint.BASIC]
+good-names = ["_", "ex", "fp", "i", "id", "j", "k", "on", "Run", "T"]
+
+[tool.pylint.DESIGN]
+max-attributes = 8
+
+[tool.pylint."MESSAGES CONTROL"]
+disable = ["duplicate-code", "format", "unsubscriptable-object", "no-member", "too-many-arguments", "protected-access", "invalid-name", "wrong-import-order", "too-many-statements", "too-many-public-methods", "too-many-instance-attributes", "redefined-builtin"]
+
+[tool.pylint.SIMILARITIES]
+ignore-imports = true
+
+[tool.pylint.FORMAT]
+max-line-length = 88
+
+[tool.pytest.ini_options]
+addopts = "--cov --cov-fail-under=55" # Fice for now, since this is how the project was inherited
+asyncio_mode = "auto"
+
+[tool.ruff]
+ignore = [
+  "ANN401",  # Opinionated warning on disallowing dynamically typed expressions
+  "D203",    # Conflicts with other rules
+  "ARG002",  # Conflicts with other rules
+  "D213",    # Conflicts with other rules
+  "D417",    # False positives in some occasions
+  "PLR2004", # Just annoying, not really useful
+  "SLOT000", # Has a bug with enums: https://github.com/astral-sh/ruff/issues/5748
+  "TRY003",  # Avoid specifying long messages outside the exception class
+  "EM101",   # Exception must not use a string literal, assign to variable first
+  "EM102",   # Exception must not use an f-string literal, assign to variable first
+  "PLR0913", # Too many arguments in function definition
+  "N815",    # Scope should not be mixedCase
+  "PLR0912", # Too many branches
+  "PLR0915", # Too many statements
+  "C901",    # Too complex
+
+  # Conflicts with the Ruff formatter
+  "COM812",
+  "ISC001",
+]
+select = ["ALL"]
+
+[tool.ruff.lint]
+ignore = [
+  "ANN401",  # Opinionated warning on disallowing dynamically typed expressions
+  "D203",    # Conflicts with other rules
+  "ARG002",  # Conflicts with other rules
+  "D213",    # Conflicts with other rules
+  "D417",    # False positives in some occasions
+  "PLR2004", # Just annoying, not really useful
+  "SLOT000", # Has a bug with enums: https://github.com/astral-sh/ruff/issues/5748
+  "TRY003",  # Avoid specifying long messages outside the exception class
+  "EM101",   # Exception must not use a string literal, assign to variable first
+  "EM102",   # Exception must not use an f-string literal, assign to variable first
+  "PLR0913", # Too many arguments in function definition
+  "N815",    # Scope should not be mixedCase
+  "PLR0912", # Too many branches
+  "PLR0915", # Too many statements
+  "C901",    # Too complex
+
+  # Conflicts with the Ruff formatter
+  "COM812",
+  "ISC001",
+]
+select = ["ALL"]
+
+[tool.ruff.lint.flake8-pytest-style]
+fixture-parentheses = false
+mark-parentheses = false
+
+[tool.ruff.lint.isort]
+known-first-party = ["pymelcloud"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 25
+
+[build-system]
+build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core>=1.0.0"]
