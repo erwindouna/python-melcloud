@@ -107,7 +107,7 @@ ignore-imports = true
 max-line-length = 88
 
 [tool.pytest.ini_options]
-addopts = "--cov"
+addopts = "--cov --cov-fail-under=60" # Fice for now, since this is how the project was inherited
 asyncio_mode = "auto"
 
 [tool.ruff]
