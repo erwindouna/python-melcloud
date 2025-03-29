@@ -60,5 +60,7 @@
 		"ghcr.io/devcontainers/features/python:1": {
 			"installTools": false
 		}
-	}
+	},
+	"updateContentCommand": ". ${NVM_DIR}/nvm.sh && nvm install && nvm use && npm install && poetry install && poetry run pre-commit install",
+	"postStartCommand": ". ${NVM_DIR}/nvm.sh && nvm install && nvm use && npm install && poetry install && poetry run pre-commit install"
 }
