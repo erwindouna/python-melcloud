@@ -4,6 +4,7 @@ import asyncio
 import logging
 
 import aiohttp
+
 import pymelcloud
 
 logging.basicConfig(level=logging.INFO)
@@ -20,12 +21,15 @@ async def main() -> None:
     Raises
     ------
         ValueError: If login fails due to invalid credentials or other issues.
+
     """
     async with aiohttp.ClientSession() as session:
         try:
             # Call the login method with the session
             token = await pymelcloud.login(
-                "my@example.com", "mysecretpassword", session=session
+                email="my@example.com",
+                password="mysecretpassword",  # noqa: S106
+                session=session,
             )
             logger.info("Login successful, token: %s", token)
         except ValueError:
