@@ -3,7 +3,7 @@ import json
 import os
 
 import pytest
-from asynctest import CoroutineMock, Mock, patch
+from unittest.mock import AsyncMock, Mock, patch
 from pymelcloud import DEVICE_TYPE_ERV
 from pymelcloud.erv_device import (
     VENTILATION_MODE_AUTO,
@@ -22,11 +22,11 @@ def _build_device(device_conf_name: str, device_state_name: str) -> ErvDevice:
         device_state = json.load(json_file)
 
     with patch("pymelcloud.client.Client") as _client:
-        _client.update_confs = CoroutineMock()
+        _client.update_confs = AsyncMock()
         _client.device_confs.__iter__ = Mock(return_value=[device_conf].__iter__())
-        _client.fetch_device_units = CoroutineMock(return_value=[])
-        _client.fetch_device_state = CoroutineMock(return_value=device_state)
-        _client.fetch_energy_report = CoroutineMock(return_value=None)
+        _client.fetch_device_units = AsyncMock(return_value=[])
+        _client.fetch_device_state = AsyncMock(return_value=device_state)
+        _client.fetch_energy_report = AsyncMock(return_value=None)
         client = _client
 
     return ErvDevice(device_conf, client)

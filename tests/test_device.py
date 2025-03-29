@@ -2,11 +2,12 @@
 from typing import Any, Dict, Optional
 
 import pytest
+from unittest.mock import AsyncMock, Mock, patch
 from pymelcloud.ata_device import AtaDevice
 from .util import build_device
 
 
-def _build_device(device_conf_name: str, device_state_name: str, energy_report: Optional[Dict[Any, Any]]=None) -> AtaDevice:
+def _build_device(device_conf_name: str, device_state_name: str, energy_report: Optional[Dict[Any, Any]] = None) -> AtaDevice:
     device_conf, client = build_device(device_conf_name, device_state_name, energy_report)
     return AtaDevice(device_conf, client)
 
