@@ -35,7 +35,7 @@ jobs:
       - name: 🏗 Install dependencies
         run: poetry install --no-interaction
       - name: 🚀 Run pytest
-        run: poetry run pytest --cov tado tests
+        run: poetry run pytest --cov python-melcloud tests
       - name: ⬆️ Upload coverage artifact
         uses: actions/upload-artifact@v4.3.1
         with:
@@ -75,7 +75,7 @@ jobs:
         uses: codecov/codecov-action@v4.1.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          slug: erwindouna/python-tado
+          slug: erwindouna/python-melcloud
       - name: SonarCloud Scan
         if: github.event.pull_request.head.repo.fork == false
         uses: SonarSource/sonarcloud-github-action@v2.1.1

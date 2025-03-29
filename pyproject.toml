@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "python-melcloud-redux"
+name = "python-melcloud"
 version = "0.1.0"
 authors = ["Erwin Douna <e.douna@gmail.com>"]
 classifiers = [
@@ -56,7 +56,7 @@ show_missing = true
 
 [tool.coverage.run]
 plugins = ["covdefaults"]
-source = ["src/pymelcloud"]
+source = ["pymelcloud"]
 
 [tool.mypy]
 # Specify the target platform details in config, so your developers are
@@ -163,7 +163,7 @@ fixture-parentheses = false
 mark-parentheses = false
 
 [tool.ruff.lint.isort]
-known-first-party = ["tado"]
+known-first-party = ["pymelcloud"]
 
 [tool.ruff.lint.mccabe]
 max-complexity = 25
