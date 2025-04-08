@@ -1,4 +1,5 @@
 """Air-To-Water (DeviceType=1) device definition."""
+
 from typing import Any, Callable, Dict, List, Optional
 
 from pymelcloud.device import EFFECTIVE_FLAGS, Device
@@ -209,7 +210,7 @@ class Zone:
         """Set target flow temperature for the currently active operation mode."""
         op_mode = self.operation_mode
         if op_mode is None:
-            return None
+            return
 
         if op_mode in [
             ZONE_OPERATION_MODE_COOL_THERMOSTAT,

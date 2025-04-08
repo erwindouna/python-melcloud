@@ -1,9 +1,10 @@
 """Air-To-Air (DeviceType=0) device definition."""
+
 from datetime import timedelta
 from typing import Any, Dict, List, Optional
 
-from pymelcloud.device import EFFECTIVE_FLAGS, Device
 from pymelcloud.client import Client
+from pymelcloud.device import EFFECTIVE_FLAGS, Device
 
 PROPERTY_TARGET_TEMPERATURE = "target_temperature"
 PROPERTY_OPERATION_MODE = "operation_mode"

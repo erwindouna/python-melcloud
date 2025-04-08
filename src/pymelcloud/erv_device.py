@@ -1,4 +1,5 @@
 """Energy-Recovery-Ventilation (DeviceType=3) device definition."""
+
 from typing import Any, Dict, List, Optional
 
 from pymelcloud.device import EFFECTIVE_FLAGS, Device

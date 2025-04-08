@@ -1,20 +1,27 @@
-import json
-import os
-from typing import Any, Dict, Optional
+"""Test utilities for pymelcloud."""
 
+from __future__ import annotations
+
+import json
+from pathlib import Path
+from typing import Any
 from unittest.mock import AsyncMock, Mock, patch
 
-import src.pymelcloud  # Ensure the import reflects the new location
- 
-def build_device(device_conf_name: str, device_state_name: str, energy_report: Optional[Dict[Any, Any]]=None):
-    test_dir = os.path.join(os.path.dirname(__file__), "samples")
-    with open(os.path.join(test_dir, device_conf_name), "r") as json_file:
+
+def build_device(
+    device_conf_name: str,
+    device_state_name: str,
+    energy_report: dict[Any, Any] | None = None,
+) -> tuple[dict[str, Any], Mock]:
+    """Build a device mock for testing."""
+    test_dir = Path(__file__).parent / "samples"
+    with (test_dir / device_conf_name).open() as json_file:
         device_conf = json.load(json_file)
 
-    with open(os.path.join(test_dir, device_state_name), "r") as json_file:
+    with (test_dir / device_state_name).open() as json_file:
         device_state = json.load(json_file)
 
-    with patch("src.pymelcloud.client.Client") as _client:  # Ensure the patch path reflects the new location
+    with patch("src.pymelcloud.client.Client") as _client:
         _client.update_confs = AsyncMock()
         _client.device_confs.__iter__ = Mock(return_value=[device_conf].__iter__())
         _client.fetch_device_units = AsyncMock(return_value=[])

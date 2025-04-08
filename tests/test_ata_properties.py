@@ -1,47 +1,32 @@
 """ATA tests."""
+
 import json
 import os
+from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
-from unittest.mock import AsyncMock, Mock, patch
 from aiohttp.web import HTTPForbidden
-from src.pymelcloud import DEVICE_TYPE_ATA
 
-import src.pymelcloud
-from src.pymelcloud.const import ACCESS_LEVEL
+from src.pymelcloud import DEVICE_TYPE_ATA
 from src.pymelcloud.ata_device import (
-    OPERATION_MODE_HEAT,
-    OPERATION_MODE_DRY,
+    H_VANE_POSITION_3,
     OPERATION_MODE_COOL,
+    OPERATION_MODE_DRY,
     OPERATION_MODE_FAN_ONLY,
+    OPERATION_MODE_HEAT,
     OPERATION_MODE_HEAT_COOL,
     V_VANE_POSITION_AUTO,
-    V_VANE_POSITION_1,
-    V_VANE_POSITION_2,
-    V_VANE_POSITION_3,
-    V_VANE_POSITION_4,
-    V_VANE_POSITION_5,
-    V_VANE_POSITION_SWING,
-    V_VANE_POSITION_UNDEFINED,
-    H_VANE_POSITION_AUTO,
-    H_VANE_POSITION_1,
-    H_VANE_POSITION_2,
-    H_VANE_POSITION_3,
-    H_VANE_POSITION_4,
-    H_VANE_POSITION_5,
-    H_VANE_POSITION_SPLIT,
-    H_VANE_POSITION_SWING,
-    H_VANE_POSITION_UNDEFINED,
     AtaDevice,
 )
+from src.pymelcloud.const import ACCESS_LEVEL
 
 
 def _build_device(device_conf_name: str, device_state_name: str) -> AtaDevice:
     test_dir = os.path.join(os.path.dirname(__file__), "samples")
-    with open(os.path.join(test_dir, device_conf_name), "r") as json_file:
+    with open(os.path.join(test_dir, device_conf_name)) as json_file:
         device_conf = json.load(json_file)
 
-    with open(os.path.join(test_dir, device_state_name), "r") as json_file:
+    with open(os.path.join(test_dir, device_state_name)) as json_file:
         device_state = json.load(json_file)
 
     with patch("src.pymelcloud.client.Client") as _client:

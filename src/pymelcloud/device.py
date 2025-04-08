@@ -1,17 +1,18 @@
 """Base MELCloud device."""
+
 import asyncio
 from abc import ABC, abstractmethod
 from datetime import datetime, timedelta, timezone
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import ROUND_HALF_UP, Decimal
 from typing import Any, Dict, List, Optional
 
 from pymelcloud.client import Client
 from pymelcloud.const import (
+    ACCESS_LEVEL,
     DEVICE_TYPE_LOOKUP,
     DEVICE_TYPE_UNKNOWN,
     UNIT_TEMP_CELSIUS,
     UNIT_TEMP_FAHRENHEIT,
-    ACCESS_LEVEL,
 )
 
 PROPERTY_POWER = "power"
@@ -64,10 +65,14 @@ class Device(ABC):
 
     def round_temperature(self, temperature: float) -> float:
         """Round a temperature to the nearest temperature increment."""
-        return float(
-            Decimal(str(temperature / self.temperature_increment))
-            .quantize(Decimal('1'), rounding=ROUND_HALF_UP)
-        ) * self.temperature_increment
+        return (
+            float(
+                Decimal(str(temperature / self.temperature_increment)).quantize(
+                    Decimal("1"), rounding=ROUND_HALF_UP
+                )
+            )
+            * self.temperature_increment
+        )
 
     @abstractmethod
     def apply_write(self, state: Dict[str, Any], key: str, value: Any):
@@ -75,7 +80,6 @@ class Device(ABC):
 
         Used for property validation, do not modify device state.
         """
-        pass
 
     async def update(self):
         """Fetch state of the device from MELCloud.
@@ -217,7 +221,7 @@ class Device(ABC):
 
         consumption = 0
 
-        for mode in ['Heating', 'Cooling', 'Auto', 'Dry', 'Fan', 'Other']:
+        for mode in ["Heating", "Cooling", "Auto", "Dry", "Fan", "Other"]:
             previous_reports = self._energy_report.get(mode, [0.0])
             if previous_reports:
                 last_report = previous_reports[-1]

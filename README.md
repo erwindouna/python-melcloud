@@ -29,7 +29,7 @@ availability issues.
 
 * Air-to-air heat pumps (DeviceType=0)
 * Air-to-water heat pumps (DeviceType=1)
-* Energy Recovery Ventilators (DeviceType=3) 
+* Energy Recovery Ventilators (DeviceType=3)
 
 ## Read
 
