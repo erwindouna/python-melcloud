@@ -1,0 +1,23 @@
+{
+    "ErrorId": 1,
+    "ErrorMessage": null,
+    "LoginStatus": 0,
+    "UserId": 0,
+    "RandomKey": null,
+    "AppVersionAnnouncement": null,
+    "LoginData": null,
+    "ListPendingInvite": null,
+    "ListOwnershipChangeRequest": null,
+    "ListPendingAnnouncement": null,
+    "LoginMinutes": 0,
+    "LoginAttempts": 1,
+    "EnableRegistration": true,
+    "EnableEditStructure": true,
+    "EnableFrostProtection": true,
+    "EnableHolidayMode": true,
+    "EnableTimer": true,
+    "EnableScenes": true,
+    "EnableInviteNewGuests": true,
+    "EnableManageGuestAccess": true,
+    "EnableControlOfGuestDevices": true
+}
