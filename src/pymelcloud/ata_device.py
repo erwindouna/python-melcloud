@@ -208,6 +208,16 @@ class AtaDevice(Device):
         return self._state.get("RoomTemperature")
 
     @property
+    def outdoor_temperature(self) -> Optional[float]:
+        """Return outdoor temperature reported by the device."""
+        if self._device_conf.get("HideOutdoorTemperature", False):
+            return None
+        device = self._device_conf.get("Device", {})
+        if not device.get("HasOutdoorTemperature", False):
+            return None
+        return device.get("OutdoorTemperature")
+
+    @property
     def target_temperature(self) -> Optional[float]:
         """Return target temperature set for the device."""
         if self._state is None:
