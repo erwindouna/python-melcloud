@@ -54,6 +54,7 @@ one has the time to go through the source.
 
 ### Air-to-air heat pump properties
 * `room_temperature`
+* `outdoor_temperature`
 * `target_temperature`
 * `target_temperature_step`
 * `target_temperature_min`
