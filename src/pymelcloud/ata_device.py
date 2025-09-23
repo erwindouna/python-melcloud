@@ -321,7 +321,8 @@ class AtaDevice(Device):
         if self._device_conf.get("HideVaneControls", False):
             return []
         device = self._device_conf.get("Device", {})
-        if not device.get("ModelSupportsVaneHorizontal", False):
+        # ModelSupportsVaneVertical and ModelSupportsVaneHorizontal are swapped in the API
+        if not device.get("ModelSupportsVaneVertical", False):
             return []
 
         positions = [
@@ -351,7 +352,8 @@ class AtaDevice(Device):
         if self._device_conf.get("HideVaneControls", False):
             return []
         device = self._device_conf.get("Device", {})
-        if not device.get("ModelSupportsVaneVertical", False):
+        # ModelSupportsVaneHorizontal and ModelSupportsVaneVertical are swapped in the API
+        if not device.get("ModelSupportsVaneHorizontal", False):
             return []
 
         positions = [
