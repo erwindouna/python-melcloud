@@ -242,8 +242,6 @@ class Zone:
         if state is None:
             return None
 
-        print(state)
-
         mode = state.get(f"OperationModeZone{self.zone_index}")
         if not isinstance(mode, int):
             raise ValueError(f"Invalid operation mode [{mode}]")
