@@ -212,7 +212,7 @@ class AtaDevice(Device):
         """Return True if the device has an outdoor temperature sensor."""
         if self._device_conf.get("HideOutdoorTemperature", False):
             return False
-        return self._device_conf.get("Device", {}).get("HasOutdoorTemperature", False):
+        return self._device_conf.get("Device", {}).get("HasOutdoorTemperature", False)
 
     @property
     def outdoor_temperature(self) -> Optional[float]:
