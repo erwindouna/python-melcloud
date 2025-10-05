@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "python-melcloud"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Erwin Douna <e.douna@gmail.com>"]
 classifiers = [
   "Development Status :: 5 - Production/Stable",
