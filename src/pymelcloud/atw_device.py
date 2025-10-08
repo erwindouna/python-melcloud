@@ -1,5 +1,7 @@
 """Air-To-Water (DeviceType=1) device definition."""
-from typing import Any, Callable, Dict, List, Optional
+
+from collections.abc import Callable
+from typing import Any
 
 from pymelcloud.device import EFFECTIVE_FLAGS, Device
 
@@ -71,11 +73,11 @@ class Zone:
 
     def __init__(
         self,
-        device,
-        device_state: Callable[[], Optional[Dict[Any, Any]]],
-        device_conf: Callable[[], Dict[Any, Any]],
+        device: "AtwDevice",
+        device_state: Callable[[], dict[Any, Any] | None],
+        device_conf: Callable[[], dict[Any, Any]],
         zone_index: int,
-    ):
+    ) -> None:
         """Initialize Zone."""
         self._device = device
         self._device_state = device_state
@@ -83,7 +85,7 @@ class Zone:
         self.zone_index = zone_index
 
     @property
-    def name(self) -> Optional[str]:
+    def name(self) -> str | None:
         """Return zone name.
 
         If a name is not defined, a name is generated using format "Zone n" where "n"
@@ -92,10 +94,10 @@ class Zone:
         zone_name = self._device_conf().get(f"Zone{self.zone_index}Name")
         if zone_name is None:
             return f"Zone {self.zone_index}"
-        return zone_name
+        return str(zone_name)
 
     @property
-    def prohibit(self) -> Optional[bool]:
+    def prohibit(self) -> bool | None:
         """Return prohibit flag of the zone."""
         state = self._device_state()
         if state is None:
@@ -131,7 +133,7 @@ class Zone:
         return ZONE_STATUS_UNKNOWN
 
     @property
-    def room_temperature(self) -> Optional[float]:
+    def room_temperature(self) -> float | None:
         """Return room temperature."""
         state = self._device_state()
         if state is None:
@@ -139,14 +141,14 @@ class Zone:
         return state.get(f"RoomTemperatureZone{self.zone_index}")
 
     @property
-    def target_temperature(self) -> Optional[float]:
+    def target_temperature(self) -> float | None:
         """Return target temperature."""
         state = self._device_state()
         if state is None:
             return None
         return state.get(f"SetTemperatureZone{self.zone_index}")
 
-    async def set_target_temperature(self, target_temperature):
+    async def set_target_temperature(self, target_temperature: float) -> None:
         """Set target temperature for this zone."""
         if self.zone_index == 1:
             prop = PROPERTY_ZONE_1_TARGET_TEMPERATURE
@@ -161,7 +163,8 @@ class Zone:
         This value is not available in the standard state poll response. The poll
         update frequency can be a little bit lower that expected.
         """
-        return self._device_conf()["Device"]["FlowTemperature"]
+        flow_temp = self._device_conf()["Device"]["FlowTemperature"]
+        return float(flow_temp)
 
     @property
     def return_temperature(self) -> float:
@@ -170,10 +173,11 @@ class Zone:
         This value is not available in the standard state poll response. The poll
         update frequency can be a little bit lower that expected.
         """
-        return self._device_conf()["Device"]["ReturnTemperature"]
+        return_temp = self._device_conf()["Device"]["ReturnTemperature"]
+        return float(return_temp)
 
     @property
-    def target_flow_temperature(self) -> Optional[float]:
+    def target_flow_temperature(self) -> float | None:
         """Return target flow temperature of the currently active operation mode."""
         op_mode = self.operation_mode
         if op_mode is None:
@@ -188,7 +192,7 @@ class Zone:
         return self.target_heat_flow_temperature
 
     @property
-    def target_heat_flow_temperature(self) -> Optional[float]:
+    def target_heat_flow_temperature(self) -> float | None:
         """Return target heat flow temperature."""
         state = self._device_state()
         if state is None:
@@ -197,7 +201,7 @@ class Zone:
         return state.get(f"SetHeatFlowTemperatureZone{self.zone_index}")
 
     @property
-    def target_cool_flow_temperature(self) -> Optional[float]:
+    def target_cool_flow_temperature(self) -> float | None:
         """Return target cool flow temperature."""
         state = self._device_state()
         if state is None:
@@ -205,11 +209,11 @@ class Zone:
 
         return state.get(f"SetCoolFlowTemperatureZone{self.zone_index}")
 
-    async def set_target_flow_temperature(self, target_flow_temperature):
+    async def set_target_flow_temperature(self, target_flow_temperature: float) -> None:
         """Set target flow temperature for the currently active operation mode."""
         op_mode = self.operation_mode
         if op_mode is None:
-            return None
+            return
 
         if op_mode in [
             ZONE_OPERATION_MODE_COOL_THERMOSTAT,
@@ -219,7 +223,9 @@ class Zone:
         else:
             await self.set_target_heat_flow_temperature(target_flow_temperature)
 
-    async def set_target_heat_flow_temperature(self, target_flow_temperature):
+    async def set_target_heat_flow_temperature(
+        self, target_flow_temperature: float
+    ) -> None:
         """Set target heat flow temperature of this zone."""
         if self.zone_index == 1:
             prop = PROPERTY_ZONE_1_TARGET_HEAT_FLOW_TEMPERATURE
@@ -227,7 +233,9 @@ class Zone:
             prop = PROPERTY_ZONE_2_TARGET_HEAT_FLOW_TEMPERATURE
         await self._device.set({prop: target_flow_temperature})
 
-    async def set_target_cool_flow_temperature(self, target_flow_temperature):
+    async def set_target_cool_flow_temperature(
+        self, target_flow_temperature: float
+    ) -> None:
         """Set target cool flow temperature of this zone."""
         if self.zone_index == 1:
             prop = PROPERTY_ZONE_1_TARGET_COOL_FLOW_TEMPERATURE
@@ -236,7 +244,7 @@ class Zone:
         await self._device.set({prop: target_flow_temperature})
 
     @property
-    def operation_mode(self) -> Optional[str]:
+    def operation_mode(self) -> str | None:
         """Return current operation mode."""
         state = self._device_state()
         if state is None:
@@ -244,7 +252,7 @@ class Zone:
 
         mode = state.get(f"OperationModeZone{self.zone_index}")
         if not isinstance(mode, int):
-            raise ValueError(f"Invalid operation mode [{mode}]")
+            raise TypeError(f"Invalid operation mode [{mode}]")
 
         return _ZONE_OPERATION_MODE_LOOKUP.get(
             mode,
@@ -252,7 +260,7 @@ class Zone:
         )
 
     @property
-    def operation_modes(self) -> List[str]:
+    def operation_modes(self) -> list[str]:
         """Return list of available operation modes."""
         modes = []
         device = self._device_conf().get("Device", {})
@@ -269,7 +277,7 @@ class Zone:
             ]
         return modes
 
-    async def set_operation_mode(self, mode: str):
+    async def set_operation_mode(self, mode: str) -> None:
         """Change operation mode."""
         state = self._device_state()
         if state is None:
@@ -290,7 +298,7 @@ class Zone:
 class AtwDevice(Device):
     """Air-to-Water device."""
 
-    def apply_write(self, state: Dict[str, Any], key: str, value: Any):
+    def apply_write(self, state: dict[str, Any], key: str, value: Any) -> None:
         """Apply writes to state object."""
         flags = state.get(EFFECTIVE_FLAGS, 0)
 
@@ -330,17 +338,17 @@ class AtwDevice(Device):
         state[EFFECTIVE_FLAGS] = flags
 
     @property
-    def tank_temperature(self) -> Optional[float]:
+    def tank_temperature(self) -> float | None:
         """Return tank water temperature."""
         return self.get_state_prop("TankWaterTemperature")
 
     @property
-    def target_tank_temperature(self) -> Optional[float]:
+    def target_tank_temperature(self) -> float | None:
         """Return target tank water temperature."""
         return self.get_state_prop("SetTankWaterTemperature")
 
     @property
-    def target_tank_temperature_min(self) -> Optional[float]:
+    def target_tank_temperature_min(self) -> float | None:
         """Return minimum target tank water temperature.
 
         The value does not seem to be available on the API. A fixed value is used
@@ -349,7 +357,7 @@ class AtwDevice(Device):
         return 40.0
 
     @property
-    def target_tank_temperature_max(self) -> Optional[float]:
+    def target_tank_temperature_max(self) -> float | None:
         """Return maximum target tank water temperature.
 
         This value can be set using PROPERTY_TARGET_TANK_TEMPERATURE.
@@ -357,7 +365,7 @@ class AtwDevice(Device):
         return self.get_device_prop("MaxTankTemperature")
 
     @property
-    def outside_temperature(self) -> Optional[float]:
+    def outside_temperature(self) -> float | None:
         """Return outdoor temperature reported by the device.
 
         Outside temperature sensor cannot be complimented on its precision or sample
@@ -367,22 +375,22 @@ class AtwDevice(Device):
         return self.get_state_prop("OutdoorTemperature")
 
     @property
-    def flow_temperature_boiler(self) -> Optional[float]:
+    def flow_temperature_boiler(self) -> float | None:
         """Return flow temperature of the boiler."""
         return self.get_device_prop("FlowTemperatureBoiler")
 
     @property
-    def return_temperature_boiler(self) -> Optional[float]:
+    def return_temperature_boiler(self) -> float | None:
         """Return flow temperature of the boiler."""
         return self.get_device_prop("FlowTemperatureBoiler")
 
     @property
-    def mixing_tank_temperature(self) -> Optional[float]:
+    def mixing_tank_temperature(self) -> float | None:
         """Return mixing tank temperature."""
         return self.get_device_prop("MixingTankWaterTemperature")
 
     @property
-    def zones(self) -> Optional[List[Zone]]:
+    def zones(self) -> list[Zone]:
         """Return zones controlled by this device.
 
         Zones without a thermostat are not returned.
@@ -399,7 +407,7 @@ class AtwDevice(Device):
         return _zones
 
     @property
-    def status(self) -> Optional[str]:
+    def status(self) -> str | None:
         """Return current state.
 
         This is a Air-to-Water device specific property. MELCloud uses "OperationMode"
@@ -410,7 +418,7 @@ class AtwDevice(Device):
         return _STATE_LOOKUP.get(self._state.get("OperationMode", -1), STATUS_UNKNOWN)
 
     @property
-    def operation_mode(self) -> Optional[str]:
+    def operation_mode(self) -> str | None:
         """Return active operation mode.
 
         This value can be set using PROPERTY_OPERATION_MODE.
@@ -422,13 +430,14 @@ class AtwDevice(Device):
         return OPERATION_MODE_AUTO
 
     @property
-    def operation_modes(self) -> List[str]:
+    def operation_modes(self) -> list[str]:
         """Return available operation modes."""
         return [OPERATION_MODE_AUTO, OPERATION_MODE_FORCE_HOT_WATER]
 
     @property
-    def holiday_mode(self) -> Optional[bool]:
+    def holiday_mode(self) -> bool | None:
         """Return holiday mode status."""
         if self._state is None:
             return None
-        return self._state.get("HolidayMode", False)
+        result = self._state.get("HolidayMode", False)
+        return bool(result) if result is not None else None

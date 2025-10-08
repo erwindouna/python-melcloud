@@ -1,9 +1,10 @@
 """Air-To-Air (DeviceType=0) device definition."""
-from datetime import timedelta
-from typing import Any, Dict, List, Optional
 
-from pymelcloud.device import EFFECTIVE_FLAGS, Device
+from datetime import timedelta
+from typing import Any
+
 from pymelcloud.client import Client
+from pymelcloud.device import EFFECTIVE_FLAGS, Device
 
 PROPERTY_TARGET_TEMPERATURE = "target_temperature"
 PROPERTY_OPERATION_MODE = "operation_mode"
@@ -140,15 +141,15 @@ class AtaDevice(Device):
 
     def __init__(
         self,
-        device_conf: Dict[str, Any],
+        device_conf: dict[str, Any],
         client: Client,
-        set_debounce=timedelta(seconds=1),
-    ):
+        set_debounce: timedelta = timedelta(seconds=1),
+    ) -> None:
         """Initialize an ATA device."""
         super().__init__(device_conf, client, set_debounce)
         self.last_energy_value = None
 
-    def apply_write(self, state: Dict[str, Any], key: str, value: Any):
+    def apply_write(self, state: dict[str, Any], key: str, value: Any) -> None:
         """Apply writes to state object.
 
         Used for property validation, do not modify device state.
@@ -178,10 +179,13 @@ class AtaDevice(Device):
     @property
     def has_energy_consumed_meter(self) -> bool:
         """Return True if the device has an energy consumption meter."""
-        return self._device_conf.get("Device", {}).get("HasEnergyConsumedMeter", False)
+        result = self._device_conf.get("Device", {}).get(
+            "HasEnergyConsumedMeter", False
+        )
+        return bool(result)
 
     @property
-    def total_energy_consumed(self) -> Optional[float]:
+    def total_energy_consumed(self) -> float | None:
         """Return total consumed energy as kWh.
 
         The update interval is extremely slow and inconsistent. Empirical evidence
@@ -201,7 +205,7 @@ class AtaDevice(Device):
         return self.last_energy_value
 
     @property
-    def room_temperature(self) -> Optional[float]:
+    def room_temperature(self) -> float | None:
         """Return room temperature reported by the device."""
         if self._state is None:
             return None
@@ -212,20 +216,22 @@ class AtaDevice(Device):
         """Return True if the device has an outdoor temperature sensor."""
         if self._device_conf.get("HideOutdoorTemperature", False):
             return False
-        return self._device_conf.get("Device", {}).get("HasOutdoorTemperature", False)
+        result = self._device_conf.get("Device", {}).get("HasOutdoorTemperature", False)
+        return bool(result)
 
     @property
-    def outdoor_temperature(self) -> Optional[float]:
+    def outdoor_temperature(self) -> float | None:
         """Return outdoor temperature reported by the device."""
         if self._device_conf.get("HideOutdoorTemperature", False):
             return None
         device = self._device_conf.get("Device", {})
         if not device.get("HasOutdoorTemperature", False):
             return None
-        return device.get("OutdoorTemperature")
+        temp = device.get("OutdoorTemperature")
+        return float(temp) if temp is not None else None
 
     @property
-    def target_temperature(self) -> Optional[float]:
+    def target_temperature(self) -> float | None:
         """Return target temperature set for the device."""
         if self._state is None:
             return None
@@ -237,22 +243,24 @@ class AtaDevice(Device):
         return self.temperature_increment
 
     @property
-    def target_temperature_min(self) -> Optional[float]:
+    def target_temperature_min(self) -> float | None:
         """Return maximum target temperature for the currently active operation mode."""
         if self._state is None:
             return None
-        return self._device_conf.get("Device", {}).get(
+        temp = self._device_conf.get("Device", {}).get(
             _OPERATION_MODE_MIN_TEMP_LOOKUP.get(self.operation_mode), 10
         )
+        return float(temp) if temp is not None else None
 
     @property
-    def target_temperature_max(self) -> Optional[float]:
+    def target_temperature_max(self) -> float | None:
         """Return maximum target temperature for the currently active operation mode."""
         if self._state is None:
             return None
-        return self._device_conf.get("Device", {}).get(
+        temp = self._device_conf.get("Device", {}).get(
             _OPERATION_MODE_MAX_TEMP_LOOKUP.get(self.operation_mode), 31
         )
+        return float(temp) if temp is not None else None
 
     @property
     def operation_mode(self) -> str:
@@ -262,9 +270,9 @@ class AtaDevice(Device):
         return _operation_mode_from(self._state.get("OperationMode", -1))
 
     @property
-    def operation_modes(self) -> List[str]:
+    def operation_modes(self) -> list[str]:
         """Return available operation modes."""
-        modes: List[str] = []
+        modes: list[str] = []
 
         conf_dev = self._device_conf.get("Device", {})
         if conf_dev.get("CanHeat", False):
@@ -284,17 +292,18 @@ class AtaDevice(Device):
         return modes
 
     @property
-    def fan_speed(self) -> Optional[str]:
+    def fan_speed(self) -> str | None:
         """Return currently active fan speed.
 
         The argument must be on of the fan speeds returned by fan_speeds.
         """
         if self._state is None:
             return None
-        return _fan_speed_from(self._state.get("SetFanSpeed"))
+        fan_speed = self._state.get("SetFanSpeed")
+        return _fan_speed_from(fan_speed) if isinstance(fan_speed, int) else None
 
     @property
-    def fan_speeds(self) -> Optional[List[str]]:
+    def fan_speeds(self) -> list[str] | None:
         """Return available fan speeds.
 
         The supported fan speeds vary from device to device. The available modes are
@@ -320,25 +329,29 @@ class AtaDevice(Device):
             speeds.append(FAN_SPEED_AUTO)
 
         num_fan_speeds = self._state.get("NumberOfFanSpeeds", 0)
-        for num in range(1, num_fan_speeds + 1):
-            speeds.append(_fan_speed_from(num))
+        speeds.extend(_fan_speed_from(num) for num in range(1, num_fan_speeds + 1))
 
         return speeds
 
     @property
-    def vane_horizontal(self) -> Optional[str]:
+    def vane_horizontal(self) -> str | None:
         """Return horizontal vane position."""
         if self._state is None:
             return None
-        return _horizontal_vane_from(self._state.get("VaneHorizontal"))
+        vane_horizontal = self._state.get("VaneHorizontal")
+        return (
+            _horizontal_vane_from(vane_horizontal)
+            if isinstance(vane_horizontal, int)
+            else None
+        )
 
     @property
-    def vane_horizontal_positions(self) -> Optional[List[str]]:
+    def vane_horizontal_positions(self) -> list[str] | None:
         """Return available horizontal vane positions."""
         if self._device_conf.get("HideVaneControls", False):
             return []
         device = self._device_conf.get("Device", {})
-        # ModelSupportsVaneVertical and ModelSupportsVaneHorizontal are swapped in the API
+        # ModelSupportsVane* properties are swapped in the API
         if not device.get("ModelSupportsVaneVertical", False):
             return []
 
@@ -357,19 +370,24 @@ class AtaDevice(Device):
         return positions
 
     @property
-    def vane_vertical(self) -> Optional[str]:
+    def vane_vertical(self) -> str | None:
         """Return vertical vane position."""
         if self._state is None:
             return None
-        return _vertical_vane_from(self._state.get("VaneVertical"))
+        vane_vertical = self._state.get("VaneVertical")
+        return (
+            _vertical_vane_from(vane_vertical)
+            if isinstance(vane_vertical, int)
+            else None
+        )
 
     @property
-    def vane_vertical_positions(self) -> Optional[List[str]]:
+    def vane_vertical_positions(self) -> list[str] | None:
         """Return available vertical vane positions."""
         if self._device_conf.get("HideVaneControls", False):
             return []
         device = self._device_conf.get("Device", {})
-        # ModelSupportsVaneHorizontal and ModelSupportsVaneVertical are swapped in the API
+        # ModelSupportsVane* properties are swapped in the API
         if not device.get("ModelSupportsVaneHorizontal", False):
             return []
 
@@ -387,7 +405,7 @@ class AtaDevice(Device):
         return positions
 
     @property
-    def actual_fan_speed(self) -> Optional[str]:
+    def actual_fan_speed(self) -> str | None:
         """Return actual fan speed.
 
         0 is stopped, not auto

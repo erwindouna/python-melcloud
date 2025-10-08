@@ -1,7 +1,7 @@
 """Ecodan tests."""
+
 import pytest
 
-import src.pymelcloud
 from src.pymelcloud import DEVICE_TYPE_ATW
 from src.pymelcloud.atw_device import (
     OPERATION_MODE_AUTO,
@@ -19,6 +19,7 @@ from src.pymelcloud.atw_device import (
     ZONE_STATUS_UNKNOWN,
     AtwDevice,
 )
+
 from .util import build_device
 
 
@@ -28,7 +29,8 @@ def _build_device(device_conf_name: str, device_state_name: str) -> AtwDevice:
 
 
 @pytest.mark.asyncio
-async def test_1zone():
+async def test_1zone() -> None:
+    """Test ATW device with single zone configuration."""
     device = _build_device("atw_1zone_listdevice.json", "atw_1zone_get.json")
 
     assert device.name == "Heater and Water"
@@ -98,7 +100,8 @@ async def test_1zone():
 
 
 @pytest.mark.asyncio
-async def test_2zone():
+async def test_2zone() -> None:
+    """Test ATW device with dual zone configuration."""
     device = _build_device("atw_2zone_listdevice.json", "atw_2zone_get.json")
 
     assert device.name == "Home"
@@ -194,7 +197,8 @@ async def test_2zone():
 
 
 @pytest.mark.asyncio
-async def test_2zone_cancool():
+async def test_2zone_cancool() -> None:
+    """Test ATW device with dual zone configuration and cooling capability."""
     device = _build_device(
         "atw_2zone_cancool_listdevice.json", "atw_2zone_cancool_get.json"
     )

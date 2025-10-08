@@ -59,7 +59,7 @@ rules:
     level: error
   new-lines:
     level: error
-    type: unix
+    type: platform
   trailing-spaces:
     level: error
   truthy:

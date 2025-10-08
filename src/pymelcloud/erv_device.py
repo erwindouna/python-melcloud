@@ -1,5 +1,6 @@
 """Energy-Recovery-Ventilation (DeviceType=3) device definition."""
-from typing import Any, Dict, List, Optional
+
+from typing import Any
 
 from pymelcloud.device import EFFECTIVE_FLAGS, Device
 
@@ -51,7 +52,7 @@ def _ventilation_mode_to(mode: str) -> int:
 class ErvDevice(Device):
     """Energy-Recovery-Ventilation device."""
 
-    def apply_write(self, state: Dict[str, Any], key: str, value: Any):
+    def apply_write(self, state: dict[str, Any], key: str, value: Any) -> None:
         """Apply writes to state object.
 
         Used for property validation, do not modify device state.
@@ -69,18 +70,20 @@ class ErvDevice(Device):
 
         state[EFFECTIVE_FLAGS] = flags
 
-    def _device(self) -> Dict[str, Any]:
-        return self._device_conf.get("Device", {})
+    def _device(self) -> dict[str, Any]:
+        device_data = self._device_conf.get("Device", {})
+        return dict(device_data) if device_data is not None else {}
 
     @property
     def has_energy_consumed_meter(self) -> bool:
         """Return True if the device has an energy consumption meter."""
         if self._device_conf is None:
             return False
-        return self._device().get("HasEnergyConsumedMeter", False)
+        result = self._device().get("HasEnergyConsumedMeter", False)
+        return bool(result)
 
     @property
-    def total_energy_consumed(self) -> Optional[float]:
+    def total_energy_consumed(self) -> float | None:
         """Return total consumed energy as kWh.
 
         The update interval is extremely slow and inconsistent. Empirical evidence
@@ -91,49 +94,46 @@ class ErvDevice(Device):
         reading = self._device().get("CurrentEnergyConsumed", None)
         if reading is None:
             return None
-        return reading / 1000.0
+        return float(reading) / 1000.0
 
     @property
-    def presets(self) -> List[Dict[Any, Any]]:
+    def presets(self) -> list[dict[Any, Any]]:
         """Return presets configuration (preset created using melcloud app)."""
-        retval = []
-        if self._device_conf is not None:
-            presets_conf = self._device_conf.get("Presets", {})
-            for p in presets_conf:
-                retval.append(p)
-
-        return retval
+        if self._device_conf is None:
+            return []
+        presets_conf = self._device_conf.get("Presets", {})
+        return list(presets_conf)
 
     @property
-    def room_temperature(self) -> Optional[float]:
+    def room_temperature(self) -> float | None:
         """Return room temperature reported by the device."""
         if self._state is None:
             return None
         return self._state.get("RoomTemperature")
 
     @property
-    def outside_temperature(self) -> Optional[float]:
+    def outside_temperature(self) -> float | None:
         """Return outdoor temperature reported by the device."""
         if self._state is None:
             return None
         return self._state.get("OutdoorTemperature")
 
     @property
-    def ventilation_mode(self) -> Optional[str]:
+    def ventilation_mode(self) -> str | None:
         """Return currently active ventilation mode."""
         if self._state is None:
             return None
         return _ventilation_mode_from(self._state.get("VentilationMode", -1))
 
     @property
-    def actual_ventilation_mode(self) -> Optional[str]:
+    def actual_ventilation_mode(self) -> str | None:
         """Return actual ventilation mode."""
         if self._state is None:
             return None
         return _ventilation_mode_from(self._device().get("ActualVentilationMode", -1))
 
     @property
-    def fan_speed(self) -> Optional[str]:
+    def fan_speed(self) -> str | None:
         """Return currently active fan speed.
 
         The argument must be one of the fan speeds returned by fan_speeds.
@@ -143,7 +143,7 @@ class ErvDevice(Device):
         return _fan_speed_from(self._state.get("SetFanSpeed", -1))
 
     @property
-    def actual_supply_fan_speed(self) -> Optional[str]:
+    def actual_supply_fan_speed(self) -> str | None:
         """Return actual supply fan speed.
 
         The argument must be one of the fan speeds returned by fan_speeds.
@@ -153,7 +153,7 @@ class ErvDevice(Device):
         return _fan_speed_from(self._device().get("ActualSupplyFanSpeed", -1))
 
     @property
-    def actual_exhaust_fan_speed(self) -> Optional[str]:
+    def actual_exhaust_fan_speed(self) -> str | None:
         """Return actual exhaust fan speed.
 
         The argument must be one of the fan speeds returned by fan_speeds.
@@ -167,24 +167,27 @@ class ErvDevice(Device):
         """Return True if core maintenance required."""
         if self._device_conf is None:
             return False
-        return self._device().get("CoreMaintenanceRequired", False)
+        result = self._device().get("CoreMaintenanceRequired", False)
+        return bool(result)
 
     @property
     def filter_maintenance_required(self) -> bool:
         """Return True if filter maintenance required."""
         if self._device_conf is None:
             return False
-        return self._device().get("FilterMaintenanceRequired", False)
+        result = self._device().get("FilterMaintenanceRequired", False)
+        return bool(result)
 
     @property
     def night_purge_mode(self) -> bool:
         """Return True if NightPurgeMode."""
         if self._device_conf is None:
             return False
-        return self._device().get("NightPurgeMode", False)
+        result = self._device().get("NightPurgeMode", False)
+        return bool(result)
 
     @property
-    def room_co2_level(self) -> Optional[float]:
+    def room_co2_level(self) -> float | None:
         """Return co2 level if supported by the device."""
         if self._state is None:
             return None
@@ -192,10 +195,11 @@ class ErvDevice(Device):
         if not self._state.get("HasCO2Sensor", False):
             return None
 
-        return self._device().get("RoomCO2Level", None)
+        co2_level = self._device().get("RoomCO2Level", None)
+        return float(co2_level) if co2_level is not None else None
 
     @property
-    def fan_speeds(self) -> Optional[List[str]]:
+    def fan_speeds(self) -> list[str] | None:
         """Return available fan speeds.
 
         The supported fan speeds vary from device to device. The available modes are
@@ -216,18 +220,17 @@ class ErvDevice(Device):
         """
         if self._state is None:
             return None
-        speeds = []
+        speeds: list[str] = []
 
         num_fan_speeds = self._state.get("NumberOfFanSpeeds", 0)
-        for num in range(1, num_fan_speeds + 1):
-            speeds.append(_fan_speed_from(num))
+        speeds.extend(_fan_speed_from(num) for num in range(1, num_fan_speeds + 1))
 
         return speeds
 
     @property
-    def ventilation_modes(self) -> List[str]:
+    def ventilation_modes(self) -> list[str]:
         """Return available ventilation modes."""
-        modes: List[str] = [VENTILATION_MODE_RECOVERY]
+        modes: list[str] = [VENTILATION_MODE_RECOVERY]
 
         device = self._device()
 
