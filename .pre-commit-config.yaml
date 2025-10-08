@@ -81,8 +81,10 @@ repos:
         name: 🆎 Static type checking using mypy
         language: system
         types: [python]
-        entry: poetry run mypy
+        entry: poetry run mypy --namespace-packages
         require_serial: true
+        pass_filenames: false
+        args: [src]
       - id: no-commit-to-branch
         name: 🛑 Don't commit to main branch
         language: system
@@ -107,7 +109,8 @@ repos:
         name: 🌟 Starring code with pylint
         language: system
         types: [python]
-        entry: poetry run pylint
+        entry: poetry run pylint src
+        pass_filenames: false
       - id: pytest
         name: 🧪 Running tests and test coverage with pytest
         language: system

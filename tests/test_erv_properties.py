@@ -1,11 +1,11 @@
 """ERV tests."""
-import json
-import os
 
-import pytest
+import json
+from pathlib import Path
 from unittest.mock import AsyncMock, Mock, patch
 
-import src.pymelcloud
+import pytest
+
 from src.pymelcloud import DEVICE_TYPE_ERV
 from src.pymelcloud.erv_device import (
     VENTILATION_MODE_AUTO,
@@ -16,11 +16,13 @@ from src.pymelcloud.erv_device import (
 
 
 def _build_device(device_conf_name: str, device_state_name: str) -> ErvDevice:
-    test_dir = os.path.join(os.path.dirname(__file__), "samples")
-    with open(os.path.join(test_dir, device_conf_name), "r") as json_file:
+    test_dir = Path(__file__).parent / "samples"
+    device_conf_path = test_dir / device_conf_name
+    with device_conf_path.open() as json_file:
         device_conf = json.load(json_file)
 
-    with open(os.path.join(test_dir, device_state_name), "r") as json_file:
+    device_state_path = test_dir / device_state_name
+    with device_state_path.open() as json_file:
         device_state = json.load(json_file)
 
     with patch("src.pymelcloud.client.Client") as _client:
@@ -33,8 +35,10 @@ def _build_device(device_conf_name: str, device_state_name: str) -> ErvDevice:
 
     return ErvDevice(device_conf, client)
 
+
 @pytest.mark.asyncio
-async def test_erv():
+async def test_erv() -> None:
+    """Test ERV device properties."""
     device = _build_device("erv_listdevice.json", "erv_get.json")
 
     assert device.name == ""
@@ -80,4 +84,4 @@ async def test_erv():
     assert device.wifi_signal == -65
     assert device.has_error is False
     assert device.error_code == 8000
-    assert str(device.last_seen) == '2020-07-07 06:44:11.027000+00:00'
+    assert str(device.last_seen) == "2020-07-07 06:44:11.027000+00:00"
