@@ -161,7 +161,12 @@ class Zone:
         This value is not available in the standard state poll response. The poll
         update frequency can be a little bit lower that expected.
         """
-        return self._device_conf()["Device"]["FlowTemperature"]
+        temp = self._device_conf()["Device"].get(f"FlowTemperatureZone{self.zone_index}")
+
+        if temp is None:
+            return self._device_conf()["Device"]["FlowTemperature"]  # backward compatibility if it is needed
+
+        return temp
 
     @property
     def return_temperature(self) -> float:
@@ -170,7 +175,12 @@ class Zone:
         This value is not available in the standard state poll response. The poll
         update frequency can be a little bit lower that expected.
         """
-        return self._device_conf()["Device"]["ReturnTemperature"]
+        temp = self._device_conf()["Device"].get(f"ReturnTemperatureZone{self.zone_index}")
+
+        if temp is None:
+            return self._device_conf()["Device"]["ReturnTemperature"]  # backward compatibility if it is needed
+
+        return temp
 
     @property
     def target_flow_temperature(self) -> Optional[float]:
