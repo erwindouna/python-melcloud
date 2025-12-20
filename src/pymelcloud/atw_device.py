@@ -432,3 +432,8 @@ class AtwDevice(Device):
         if self._state is None:
             return None
         return self._state.get("HolidayMode", False)
+
+    @property
+    def immersion_heater_enabled(self) -> bool:
+        """Return if Immersion Heater Operational"""
+        return self.get_device_prop("ImmersionHeaterStatus")
