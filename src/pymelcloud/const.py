@@ -6,6 +6,7 @@ DEVICE_TYPE_ERV = "erv"
 DEVICE_TYPE_UNKNOWN = "unknown"
 
 ACCESS_LEVEL = {
+    "USER": 2,
     "GUEST": 3,
     "OWNER": 4,
 }

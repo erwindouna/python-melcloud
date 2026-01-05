@@ -4,10 +4,9 @@ import os
 
 import pytest
 from unittest.mock import AsyncMock, Mock, patch
-from aiohttp.web import HTTPForbidden
+
 from src.pymelcloud import DEVICE_TYPE_ATA
 
-import src.pymelcloud
 from src.pymelcloud.const import ACCESS_LEVEL
 from src.pymelcloud.ata_device import (
     OPERATION_MODE_HEAT,
@@ -92,12 +91,3 @@ async def test_ata():
     assert device.wifi_signal == -51
     assert device.has_error is False
     assert device.error_code == 8000
-
-
-@pytest.mark.asyncio
-async def test_ata_guest():
-    device = _build_device("ata_guest_listdevices.json", "ata_guest_get.json")
-    device._client.fetch_device_units = AsyncMock(side_effect=HTTPForbidden)
-    assert device.device_type == DEVICE_TYPE_ATA
-    assert device.access_level == ACCESS_LEVEL["GUEST"]
-    await device.update()

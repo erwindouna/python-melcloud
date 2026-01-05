@@ -1,6 +1,7 @@
 """MEL API access."""
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
+from aiohttp import ClientResponseError, ContentTypeError
 
 from aiohttp import ClientSession
 
@@ -172,14 +173,26 @@ class Client:
 
         User provided info such as indoor/outdoor unit model names and
         serial numbers.
+        If the request returns 403, then ignore it
         """
-        async with self._session.post(
-            f"{BASE_URL}/Device/ListDeviceUnits",
-            headers=_headers(self._token),
-            json={"deviceId": device.device_id},
-            raise_for_status=True,
-        ) as resp:
-            return await resp.json()
+        try:
+            async with self._session.post(
+                f"{BASE_URL}/Device/ListDeviceUnits",
+                headers=_headers(self._token),
+                json={"deviceId": device.device_id}
+            ) as resp:
+                resp.raise_for_status()
+                try:
+                    data = await resp.json()
+                except ContentTypeError:
+                    return None
+                if isinstance(data, dict):
+                    return data
+                return None
+        except ClientResponseError as e:
+            if e.status == 403:
+                return None
+            raise
 
     async def fetch_device_state(self, device) -> Optional[Dict[Any, Any]]:
         """Fetch state information of a device.
@@ -197,23 +210,35 @@ class Client:
             return await resp.json()
 
     async def fetch_energy_report(self, device) -> Optional[Dict[Any, Any]]:
-        """Fetch energy report containing today and 1-2 days from the past."""
+        """Fetch energy report containing today and 1-2 days from the past.
+        If the request returns 403, then ignore it"""
         device_id = device.device_id
         from_str = (datetime.today() - timedelta(days=2)).strftime("%Y-%m-%d")
         to_str = (datetime.today() + timedelta(days=2)).strftime("%Y-%m-%d")
 
-        async with self._session.post(
-            f"{BASE_URL}/EnergyCost/Report",
-            headers=_headers(self._token),
-            json={
-                "DeviceId": device_id,
-                "UseCurrency": False,
-                "FromDate": f"{from_str}T00:00:00",
-                "ToDate": f"{to_str}T00:00:00"
-            },
-            raise_for_status=True,
-        ) as resp:
-            return await resp.json()
+        try:
+            async with self._session.post(
+                    f"{BASE_URL}/EnergyCost/Report",
+                    headers=_headers(self._token),
+                    json={
+                        "DeviceId": device_id,
+                        "UseCurrency": False,
+                        "FromDate": f"{from_str}T00:00:00",
+                        "ToDate": f"{to_str}T00:00:00"
+                    }
+            ) as resp:
+                resp.raise_for_status()
+                try:
+                    data = await resp.json()
+                except ContentTypeError:
+                    return None
+                if isinstance(data, dict):
+                    return data
+                return None
+        except ClientResponseError as e:
+            if e.status == 403:
+                return None
+            raise
 
     async def set_device_state(self, device):
         """Update device state.
