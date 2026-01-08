@@ -108,7 +108,7 @@
 		"BoosterHeater1Status": false,
 		"BoosterHeater2Status": false,
 		"BoosterHeater2PlusStatus": false,
-		"ImmersionHeaterStatus": false,
+		"ImmersionHeaterStatus": true,
 		"WaterPump1Status": true,
 		"WaterPump2Status": true,
 		"WaterPump3Status": false,

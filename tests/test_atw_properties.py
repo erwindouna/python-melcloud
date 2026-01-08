@@ -80,6 +80,7 @@ async def test_1zone():
     assert device.flow_temperature_boiler == 25
     assert device.return_temperature_boiler == 25
     assert device.mixing_tank_temperature == 0
+    assert device.immersion_heater_enabled is False
     assert device.holiday_mode is False
     assert device.wifi_signal == -73
     assert device.has_error is False
@@ -165,6 +166,7 @@ async def test_2zone():
     assert device.flow_temperature_boiler == 25
     assert device.return_temperature_boiler == 25
     assert device.mixing_tank_temperature == 0
+    assert device.immersion_heater_enabled is True
     assert device.holiday_mode is False
     assert device.wifi_signal == -37
     assert device.has_error is False
