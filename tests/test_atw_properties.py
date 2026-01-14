@@ -60,8 +60,8 @@ async def test_1zone():
     assert zones[0].zone_index == 1
     assert zones[0].room_temperature is None
     assert zones[0].target_temperature is None
-    assert zones[0].flow_temperature == 57.5
-    assert zones[0].return_temperature == 53.0
+    assert zones[0].flow_temperature == 28.0
+    assert zones[0].return_temperature == 26.0
     assert zones[0].target_flow_temperature is None
     assert zones[0].operation_mode is None
     assert zones[0].operation_modes == [
@@ -130,8 +130,8 @@ async def test_2zone():
     assert zones[0].zone_index == 1
     assert zones[0].room_temperature is None
     assert zones[0].target_temperature is None
-    assert zones[0].flow_temperature == 36.0
-    assert zones[0].return_temperature == 30.0
+    assert zones[0].flow_temperature == 29.0
+    assert zones[0].return_temperature == 27.0
     assert zones[0].target_flow_temperature is None
     assert zones[0].operation_mode is None
     assert zones[0].operation_modes == [
@@ -145,8 +145,8 @@ async def test_2zone():
     assert zones[1].zone_index == 2
     assert zones[1].room_temperature is None
     assert zones[1].target_temperature is None
-    assert zones[1].flow_temperature == 36.0
-    assert zones[1].return_temperature == 30.0
+    assert zones[1].flow_temperature == 28.0
+    assert zones[1].return_temperature == 26.0
     assert zones[1].target_flow_temperature is None
     assert zones[1].operation_mode is None
     assert zones[1].operation_modes == [
@@ -228,8 +228,8 @@ async def test_2zone_cancool():
     assert zones[0].zone_index == 1
     assert zones[0].room_temperature is None
     assert zones[0].target_temperature is None
-    assert zones[0].flow_temperature == 50.5
-    assert zones[0].return_temperature == 50.5
+    assert zones[0].flow_temperature == 22.0
+    assert zones[0].return_temperature == 21.0
     assert zones[0].target_flow_temperature is None
     assert zones[0].operation_mode is None
     assert zones[0].operation_modes == [
@@ -245,8 +245,8 @@ async def test_2zone_cancool():
     assert zones[1].zone_index == 2
     assert zones[1].room_temperature is None
     assert zones[1].target_temperature is None
-    assert zones[1].flow_temperature == 50.5
-    assert zones[1].return_temperature == 50.5
+    assert zones[1].flow_temperature == 21.0
+    assert zones[1].return_temperature == 21.0
     assert zones[1].target_flow_temperature is None
     assert zones[1].operation_mode is None
     assert zones[1].operation_modes == [
