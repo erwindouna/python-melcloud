@@ -1,14 +1,14 @@
 """MEL API access."""
-from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
-from aiohttp import ClientResponseError, ContentTypeError
 
-from aiohttp import ClientSession
+from datetime import datetime, timedelta
+from typing import Any
+
+from aiohttp import ClientResponseError, ClientSession, ContentTypeError
 
 BASE_URL = "https://app.melcloud.com/Mitsubishi.Wifi.Client"
 
 
-def _headers(token: str) -> Dict[str, str]:
+def _headers(token: str) -> dict[str, str]:
     return {
         "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:73.0) "
         "Gecko/20100101 Firefox/73.0",
@@ -40,11 +40,11 @@ async def _do_login(_session: ClientSession, email: str, password: str):
 async def login(
     email: str,
     password: str,
-    session: Optional[ClientSession] = None,
+    session: ClientSession | None = None,
     *,
-    user_update_interval: Optional[timedelta] = None,
-    conf_update_interval: Optional[timedelta] = None,
-    device_set_debounce: Optional[timedelta] = None,
+    user_update_interval: timedelta | None = None,
+    conf_update_interval: timedelta | None = None,
+    device_set_debounce: timedelta | None = None,
 ):
     """Login using email and password."""
     if session:
@@ -72,7 +72,7 @@ class Client:
     def __init__(
         self,
         token: str,
-        session: Optional[ClientSession] = None,
+        session: ClientSession | None = None,
         *,
         user_update_interval=timedelta(minutes=5),
         conf_update_interval=timedelta(seconds=59),
@@ -92,8 +92,8 @@ class Client:
 
         self._last_user_update = None
         self._last_conf_update = None
-        self._device_confs: List[Dict[str, Any]] = []
-        self._account: Optional[Dict[str, Any]] = None
+        self._device_confs: list[dict[str, Any]] = []
+        self._account: dict[str, Any] | None = None
 
     @property
     def token(self) -> str:
@@ -101,16 +101,16 @@ class Client:
         return self._token
 
     @property
-    def device_confs(self) -> List[Dict[Any, Any]]:
+    def device_confs(self) -> list[dict[Any, Any]]:
         """Return device configurations."""
         return self._device_confs
 
     @property
-    def account(self) -> Optional[Dict[Any, Any]]:
+    def account(self) -> dict[Any, Any] | None:
         """Return account."""
         return self._account
 
-    async def _fetch_user_details(self):
+    async def _fetch_user_details(self) -> None:
         """Fetch user details."""
         async with self._session.get(
             f"{BASE_URL}/User/GetUserDetails",
@@ -119,7 +119,7 @@ class Client:
         ) as resp:
             self._account = await resp.json()
 
-    async def _fetch_device_confs(self):
+    async def _fetch_device_confs(self) -> None:
         """Fetch all configured devices."""
         url = f"{BASE_URL}/User/ListDevices"
         async with self._session.get(
@@ -168,7 +168,7 @@ class Client:
             await self._fetch_user_details()
             self._last_user_update = now
 
-    async def fetch_device_units(self, device) -> Optional[Dict[Any, Any]]:
+    async def fetch_device_units(self, device) -> dict[Any, Any] | None:
         """Fetch unit information for a device.
 
         User provided info such as indoor/outdoor unit model names and
@@ -179,7 +179,7 @@ class Client:
             async with self._session.post(
                 f"{BASE_URL}/Device/ListDeviceUnits",
                 headers=_headers(self._token),
-                json={"deviceId": device.device_id}
+                json={"deviceId": device.device_id},
             ) as resp:
                 resp.raise_for_status()
                 try:
@@ -194,7 +194,7 @@ class Client:
                 return None
             raise
 
-    async def fetch_device_state(self, device) -> Optional[Dict[Any, Any]]:
+    async def fetch_device_state(self, device) -> dict[Any, Any] | None:
         """Fetch state information of a device.
 
         This method should not be called more than once a minute. Rate
@@ -209,23 +209,24 @@ class Client:
         ) as resp:
             return await resp.json()
 
-    async def fetch_energy_report(self, device) -> Optional[Dict[Any, Any]]:
+    async def fetch_energy_report(self, device) -> dict[Any, Any] | None:
         """Fetch energy report containing today and 1-2 days from the past.
-        If the request returns 403, then ignore it"""
+        If the request returns 403, then ignore it
+        """
         device_id = device.device_id
         from_str = (datetime.today() - timedelta(days=2)).strftime("%Y-%m-%d")
         to_str = (datetime.today() + timedelta(days=2)).strftime("%Y-%m-%d")
 
         try:
             async with self._session.post(
-                    f"{BASE_URL}/EnergyCost/Report",
-                    headers=_headers(self._token),
-                    json={
-                        "DeviceId": device_id,
-                        "UseCurrency": False,
-                        "FromDate": f"{from_str}T00:00:00",
-                        "ToDate": f"{to_str}T00:00:00"
-                    }
+                f"{BASE_URL}/EnergyCost/Report",
+                headers=_headers(self._token),
+                json={
+                    "DeviceId": device_id,
+                    "UseCurrency": False,
+                    "FromDate": f"{from_str}T00:00:00",
+                    "ToDate": f"{to_str}T00:00:00",
+                },
             ) as resp:
                 resp.raise_for_status()
                 try:

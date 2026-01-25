@@ -1,49 +1,52 @@
-[tool.poetry]
+[project]
 name = "python-melcloud"
 version = "0.1.1"
-authors = ["Erwin Douna <e.douna@gmail.com>"]
+description = "Asynchronous Python client for controlling Melcloud devices."
+readme = "README.md"
+keywords = ["melcloud", "homeassistant", "api", "async", "client"]
+license = { text = "MIT" }
+maintainers = [{ name = "Erwin Douna", email = "e.douna@gmail.com" }]
+authors = [{ name = "Erwin Douna", email = "e.douna@gmail.com" }]
+requires-python = ">=3.12,<4"
 classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Framework :: AsyncIO",
   "Intended Audience :: Developers",
   "Natural Language :: English",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
   "Topic :: Software Development :: Libraries :: Python Modules",
 ]
-description = "Asynchronous Python client for controlling Melcloud devices."
-documentation = "https://github.com/erwindouna/python-melcloud"
-homepage = "https://github.com/erwindouna/python-melcloud"
-keywords = ["melcloud", "homeassistant", "api", "async", "client"]
-license = "MIT"
-maintainers = ["Erwin Douna <e.douna@gmail.com>"]
-packages = [{ include = "pymelcloud", from = "src" }]
-readme = "README.md"
-repository = "https://github.com/erwindouna/python-melcloud"
+dependencies = ["aiohttp>=3.0.0"]
 
-[tool.poetry.dependencies]
-aiohttp = ">=3.0.0"
-python = "^3.12"
+[project.optional-dependencies]
+dev = [
+  "aresponses==3.0.0",
+  "codespell==2.4.1",
+  "covdefaults==2.3.0",
+  "coverage[toml]==7.7.1",
+  "mypy==1.15.0",
+  "pre-commit==4.2.0",
+  "pre-commit-hooks==5.0.0",
+  "pylint==3.3.6",
+  "pytest==8.3.5",
+  "pytest-asyncio==0.26.0",
+  "pytest-cov==6.0.0",
+  "ruff==0.11.2",
+  "safety==3.3.1",
+  "yamllint==1.37.0",
+  "deptry==0.23.0",
+]
 
-[tool.poetry.urls]
+[project.urls]
 "Bug Tracker" = "https://github.com/erwindouna/python-melcloud/issues"
 Changelog = "https://github.com/erwindouna/python-melcloud/releases"
+Documentation = "https://github.com/erwindouna/python-melcloud"
+Homepage = "https://github.com/erwindouna/python-melcloud"
+Repository = "https://github.com/erwindouna/python-melcloud"
 
-[tool.poetry.group.dev.dependencies]
-aresponses = "3.0.0"
-codespell = "2.4.1"
-covdefaults = "2.3.0"
-coverage = { version = "7.7.1", extras = ["toml"] }
-mypy = "1.15.0"
-pre-commit = "4.2.0"
-pre-commit-hooks = "5.0.0"
-pylint = "3.3.6"
-pytest = "8.3.5"
-pytest-asyncio = "0.26.0"
-pytest-cov = "6.0.0"
-ruff = "0.11.2"
-safety = "3.3.1"
-yamllint = "1.37.0"
-deptry = "0.23.0"
+[tool.hatch.build.targets.wheel]
+packages = ["src/pymelcloud"]
 
 [tool.coverage.report]
 show_missing = true
@@ -101,7 +104,7 @@ ignore-imports = true
 max-line-length = 88
 
 [tool.pytest.ini_options]
-addopts = "--cov --cov-fail-under=55" # Fice for now, since this is how the project was inherited
+addopts = "--cov=pymelcloud --cov-fail-under=55"
 asyncio_mode = "auto"
 
 [tool.ruff]
@@ -163,5 +166,5 @@ known-first-party = ["pymelcloud"]
 max-complexity = 25
 
 [build-system]
-build-backend = "poetry.core.masonry.api"
-requires = ["poetry-core>=1.5,<2.0"]
+build-backend = "hatchling.build"
+requires = ["hatchling"]

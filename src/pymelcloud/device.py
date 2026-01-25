@@ -1,17 +1,18 @@
 """Base MELCloud device."""
+
 import asyncio
 from abc import ABC, abstractmethod
-from datetime import datetime, timedelta, timezone
-from decimal import Decimal, ROUND_HALF_UP
-from typing import Any, Dict, List, Optional
+from datetime import UTC, datetime, timedelta
+from decimal import ROUND_HALF_UP, Decimal
+from typing import Any
 
 from pymelcloud.client import Client
 from pymelcloud.const import (
+    ACCESS_LEVEL,
     DEVICE_TYPE_LOOKUP,
     DEVICE_TYPE_UNKNOWN,
     UNIT_TEMP_CELSIUS,
     UNIT_TEMP_FAHRENHEIT,
-    ACCESS_LEVEL,
 )
 
 PROPERTY_POWER = "power"
@@ -25,7 +26,7 @@ class Device(ABC):
 
     def __init__(
         self,
-        device_conf: Dict[str, Any],
+        device_conf: dict[str, Any],
         client: Client,
         set_debounce=timedelta(seconds=1),
     ):
@@ -48,15 +49,15 @@ class Device(ABC):
 
         self._set_debounce = set_debounce
         self._set_event = asyncio.Event()
-        self._write_task: Optional[asyncio.Future[None]] = None
-        self._pending_writes: Dict[str, Any] = {}
+        self._write_task: asyncio.Future[None] | None = None
+        self._pending_writes: dict[str, Any] = {}
 
-    def get_device_prop(self, name: str) -> Optional[Any]:
+    def get_device_prop(self, name: str) -> Any | None:
         """Access device properties while shortcutting the nested device access."""
         device = self._device_conf.get("Device", {})
         return device.get(name)
 
-    def get_state_prop(self, name: str) -> Optional[Any]:
+    def get_state_prop(self, name: str) -> Any | None:
         """Access state prop without None check."""
         if self._state is None:
             return None
@@ -64,18 +65,21 @@ class Device(ABC):
 
     def round_temperature(self, temperature: float) -> float:
         """Round a temperature to the nearest temperature increment."""
-        return float(
-            Decimal(str(temperature / self.temperature_increment))
-            .quantize(Decimal('1'), rounding=ROUND_HALF_UP)
-        ) * self.temperature_increment
+        return (
+            float(
+                Decimal(str(temperature / self.temperature_increment)).quantize(
+                    Decimal("1"), rounding=ROUND_HALF_UP
+                )
+            )
+            * self.temperature_increment
+        )
 
     @abstractmethod
-    def apply_write(self, state: Dict[str, Any], key: str, value: Any):
+    def apply_write(self, state: dict[str, Any], key: str, value: Any):
         """Apply writes to state object.
 
         Used for property validation, do not modify device state.
         """
-        pass
 
     async def update(self):
         """Fetch state of the device from MELCloud.
@@ -101,7 +105,7 @@ class Device(ABC):
         ):
             self._device_units = await self._client.fetch_device_units(self)
 
-    async def set(self, properties: Dict[str, Any]):
+    async def set(self, properties: dict[str, Any]):
         """Schedule property write to MELCloud."""
         if self._write_task is not None:
             self._write_task.cancel()
@@ -178,7 +182,7 @@ class Device(ABC):
         return self._device_conf.get("Device", {}).get("TemperatureIncrement", 0.5)
 
     @property
-    def last_seen(self) -> Optional[datetime]:
+    def last_seen(self) -> datetime | None:
         """Return timestamp of the last communication from device to MELCloud.
 
         The timestamp is in UTC.
@@ -187,10 +191,10 @@ class Device(ABC):
             return None
         return datetime.strptime(
             self._state.get("LastCommunication"), "%Y-%m-%dT%H:%M:%S.%f"
-        ).replace(tzinfo=timezone.utc)
+        ).replace(tzinfo=UTC)
 
     @property
-    def power(self) -> Optional[bool]:
+    def power(self) -> bool | None:
         """Return power on / standby state of the device."""
         if self._state is None:
             return None
@@ -217,7 +221,7 @@ class Device(ABC):
 
         consumption = 0
 
-        for mode in ['Heating', 'Cooling', 'Auto', 'Dry', 'Fan', 'Other']:
+        for mode in ["Heating", "Cooling", "Auto", "Dry", "Fan", "Other"]:
             previous_reports = self._energy_report.get(mode, [0.0])
             if previous_reports:
                 last_report = previous_reports[-1]

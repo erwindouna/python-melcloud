@@ -42,28 +42,23 @@ jobs:
     steps:
       - name: ⤵️ Check out code from GitHub
         uses: actions/checkout@v4.1.1
-      - name: 🏗 Set up Poetry
-        run: pipx install poetry
+      - name: 🏗 Install uv
+        uses: astral-sh/setup-uv@v5
       - name: 🏗 Set up Python ${{ env.DEFAULT_PYTHON }}
         id: python
         uses: actions/setup-python@v5.0.0
         with:
           python-version: ${{ env.DEFAULT_PYTHON }}
-          cache: "poetry"
-      - name: 🏗 Install workflow dependencies
-        run: |
-          poetry config virtualenvs.create true
-          poetry config virtualenvs.in-project true
       - name: 🏗 Install dependencies
-        run: poetry install --no-interaction
+        run: uv sync --extra dev
       - name: 🏗 Set package version
         run: |
           version="${{ github.event.release.tag_name }}"
           version="${version,,}"
           version="${version#v}"
-          poetry version --no-interaction "${version}"
+          sed -i "s/^version = .*/version = \"${version}\"/" pyproject.toml
       - name: 🏗 Build package
-        run: poetry build --no-interaction
+        run: uv build
       - name: 🚀 Publish to PyPi
         uses: pypa/gh-action-pypi-publish@v1.12.1
         with:

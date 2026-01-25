@@ -3,14 +3,31 @@
 [![PyPI version](https://badge.fury.io/py/pymelcloud.svg)](https://badge.fury.io/py/pymelcloud)
 
 This is a package for interacting with MELCloud and Mitsubishi Electric
-devices. It's still a little rough around the edges and the documentation
-is non-existent.
+devices.
 
 The goals for this package are:
 
 * To control and automate devices, not to configure them.
 * Handle device capabilities behind the scenes.
 * Make the different device types behave in predictable way.
+
+## Installation
+
+```bash
+pip install python-melcloud
+```
+
+## Development Setup
+
+This project uses [UV](https://docs.astral.sh/uv/) for dependency management. To set up a development environment:
+
+```bash
+# Install dependencies
+uv sync --extra dev
+
+# Install pre-commit hooks
+uv run pre-commit install
+```
 
 ## Notes on usage
 
@@ -29,7 +46,7 @@ availability issues.
 
 * Air-to-air heat pumps (DeviceType=0)
 * Air-to-water heat pumps (DeviceType=1)
-* Energy Recovery Ventilators (DeviceType=3) 
+* Energy Recovery Ventilators (DeviceType=3)
 
 ## Read
 
