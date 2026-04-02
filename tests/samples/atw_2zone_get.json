@@ -1,6 +1,7 @@
 {
 	"EffectiveFlags": 0,
 	"LocalIPAddress": null,
+	"DemandPercentage": 75,
 	"SetTemperatureZone1": 19.5,
 	"SetTemperatureZone2": 18,
 	"RoomTemperatureZone1": 20.5,
