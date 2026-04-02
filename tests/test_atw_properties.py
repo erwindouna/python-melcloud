@@ -426,12 +426,22 @@ async def test_2zone_cancool():
 
 
 @pytest.mark.asyncio
-async def test_apply_write_old_cool_flow_property_strings():
+async def test_apply_write_cool_flow_property_strings():
     device = _build_device(
         "atw_2zone_cancool_listdevice.json", "atw_2zone_cancool_get.json"
     )
     await device.update()
 
+    # New property strings
+    state = {"EffectiveFlags": 0}
+    device.apply_write(state, "zone_1_target_cool_flow_temperature", 20.0)
+    assert state["SetCoolFlowTemperatureZone1"] == 20.0
+
+    state = {"EffectiveFlags": 0}
+    device.apply_write(state, "zone_2_target_cool_flow_temperature", 21.0)
+    assert state["SetCoolFlowTemperatureZone2"] == 21.0
+
+    # Deprecated property strings (backwards compat)
     state = {"EffectiveFlags": 0}
     device.apply_write(state, "zone_1_target_heat_cool_temperature", 20.0)
     assert state["SetCoolFlowTemperatureZone1"] == 20.0

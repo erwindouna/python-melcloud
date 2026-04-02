@@ -355,7 +355,7 @@ class AtwDevice(Device):
             flags |= 0x1000000000000
         elif key in (
             PROPERTY_ZONE_1_TARGET_COOL_FLOW_TEMPERATURE,
-            "zone_1_target_heat_cool_temperature",
+            PROPERTY_ZONE_1_TARGET_HEAT_COOL_TEMPERATURE,
         ):
             state["SetCoolFlowTemperatureZone1"] = self.round_temperature(value)
             flags |= 0x1000000000000
@@ -364,7 +364,7 @@ class AtwDevice(Device):
             flags |= 0x1000000000000
         elif key in (
             PROPERTY_ZONE_2_TARGET_COOL_FLOW_TEMPERATURE,
-            "zone_2_target_heat_cool_temperature",
+            PROPERTY_ZONE_2_TARGET_HEAT_COOL_TEMPERATURE,
         ):
             state["SetCoolFlowTemperatureZone2"] = self.round_temperature(value)
             flags |= 0x1000000000000
@@ -433,7 +433,7 @@ class AtwDevice(Device):
 
     @property
     def return_temperature_boiler(self) -> Optional[float]:
-        """Return return temperature of the boiler."""
+        """Return the boiler return temperature."""
         return self.get_device_prop("ReturnTemperatureBoiler")
 
     @property
