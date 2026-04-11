@@ -161,7 +161,7 @@ class Zone:
         await self._device.set({prop: target_temperature})
 
     @property
-    def flow_temperature(self) -> Optional[float]:
+    def flow_temperature(self) -> float | None:
         """Return current flow temperature.
 
         .. deprecated::
@@ -173,13 +173,10 @@ class Zone:
             DeprecationWarning,
             stacklevel=2,
         )
-        result: Optional[float] = (
-            self._device_conf().get("Device", {}).get("FlowTemperature")
-        )
-        return result
+        return self._device_conf().get("Device", {}).get("FlowTemperature")
 
     @property
-    def return_temperature(self) -> Optional[float]:
+    def return_temperature(self) -> float | None:
         """Return current return temperature.
 
         .. deprecated::
@@ -191,30 +188,25 @@ class Zone:
             DeprecationWarning,
             stacklevel=2,
         )
-        result: Optional[float] = (
-            self._device_conf().get("Device", {}).get("ReturnTemperature")
-        )
-        return result
+        return self._device_conf().get("Device", {}).get("ReturnTemperature")
 
     @property
-    def zone_flow_temperature(self) -> Optional[float]:
+    def zone_flow_temperature(self) -> float | None:
         """Return current zone-specific flow temperature."""
-        result: Optional[float] = (
+        return (
             self._device_conf()
             .get("Device", {})
             .get(f"FlowTemperatureZone{self.zone_index}")
         )
-        return result
 
     @property
-    def zone_return_temperature(self) -> Optional[float]:
+    def zone_return_temperature(self) -> float | None:
         """Return current zone-specific return temperature."""
-        result: Optional[float] = (
+        return (
             self._device_conf()
             .get("Device", {})
             .get(f"ReturnTemperatureZone{self.zone_index}")
         )
-        return result
 
     @property
     def target_flow_temperature(self) -> Optional[float]:
