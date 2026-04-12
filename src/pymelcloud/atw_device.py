@@ -1,4 +1,6 @@
 """Air-To-Water (DeviceType=1) device definition."""
+
+import warnings
 from typing import Any, Callable, Dict, List, Optional
 
 from pymelcloud.device import EFFECTIVE_FLAGS, Device
@@ -9,10 +11,14 @@ PROPERTY_ZONE_1_TARGET_TEMPERATURE = "zone_1_target_temperature"
 PROPERTY_ZONE_2_TARGET_TEMPERATURE = "zone_2_target_temperature"
 PROPERTY_ZONE_1_TARGET_HEAT_FLOW_TEMPERATURE = "zone_1_target_heat_flow_temperature"
 PROPERTY_ZONE_2_TARGET_HEAT_FLOW_TEMPERATURE = "zone_2_target_heat_flow_temperature"
-PROPERTY_ZONE_1_TARGET_COOL_FLOW_TEMPERATURE = "zone_1_target_heat_cool_temperature"
-PROPERTY_ZONE_2_TARGET_COOL_FLOW_TEMPERATURE = "zone_2_target_heat_cool_temperature"
+PROPERTY_ZONE_1_TARGET_COOL_FLOW_TEMPERATURE = "zone_1_target_cool_flow_temperature"
+PROPERTY_ZONE_2_TARGET_COOL_FLOW_TEMPERATURE = "zone_2_target_cool_flow_temperature"
 PROPERTY_ZONE_1_OPERATION_MODE = "zone_1_operation_mode"
 PROPERTY_ZONE_2_OPERATION_MODE = "zone_2_operation_mode"
+
+# Deprecated aliases for backwards compatibility
+PROPERTY_ZONE_1_TARGET_HEAT_COOL_TEMPERATURE = "zone_1_target_heat_cool_temperature"
+PROPERTY_ZONE_2_TARGET_HEAT_COOL_TEMPERATURE = "zone_2_target_heat_cool_temperature"
 
 OPERATION_MODE_AUTO = "auto"
 OPERATION_MODE_FORCE_HOT_WATER = "force_hot_water"
@@ -155,22 +161,52 @@ class Zone:
         await self._device.set({prop: target_temperature})
 
     @property
-    def flow_temperature(self) -> float:
+    def flow_temperature(self) -> float | None:
         """Return current flow temperature.
 
-        This value is not available in the standard state poll response. The poll
-        update frequency can be a little bit lower that expected.
+        .. deprecated::
+            Use `device.flow_temperature` or `zone.zone_flow_temperature` instead.
         """
-        return self._device_conf()["Device"]["FlowTemperature"]
+        warnings.warn(
+            "Zone.flow_temperature is deprecated, use device.flow_temperature "
+            "or zone.zone_flow_temperature instead",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self._device_conf().get("Device", {}).get("FlowTemperature")
 
     @property
-    def return_temperature(self) -> float:
-        """Return current return flow temperature.
+    def return_temperature(self) -> float | None:
+        """Return current return temperature.
 
-        This value is not available in the standard state poll response. The poll
-        update frequency can be a little bit lower that expected.
+        .. deprecated::
+            Use `device.return_temperature` or `zone.zone_return_temperature` instead.
         """
-        return self._device_conf()["Device"]["ReturnTemperature"]
+        warnings.warn(
+            "Zone.return_temperature is deprecated, use device.return_temperature "
+            "or zone.zone_return_temperature instead",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self._device_conf().get("Device", {}).get("ReturnTemperature")
+
+    @property
+    def zone_flow_temperature(self) -> float | None:
+        """Return current zone-specific flow temperature."""
+        return (
+            self._device_conf()
+            .get("Device", {})
+            .get(f"FlowTemperatureZone{self.zone_index}")
+        )
+
+    @property
+    def zone_return_temperature(self) -> float | None:
+        """Return current zone-specific return temperature."""
+        return (
+            self._device_conf()
+            .get("Device", {})
+            .get(f"ReturnTemperatureZone{self.zone_index}")
+        )
 
     @property
     def target_flow_temperature(self) -> Optional[float]:
@@ -309,13 +345,19 @@ class AtwDevice(Device):
         elif key == PROPERTY_ZONE_1_TARGET_HEAT_FLOW_TEMPERATURE:
             state["SetHeatFlowTemperatureZone1"] = self.round_temperature(value)
             flags |= 0x1000000000000
-        elif key == PROPERTY_ZONE_1_TARGET_COOL_FLOW_TEMPERATURE:
+        elif key in (
+            PROPERTY_ZONE_1_TARGET_COOL_FLOW_TEMPERATURE,
+            PROPERTY_ZONE_1_TARGET_HEAT_COOL_TEMPERATURE,
+        ):
             state["SetCoolFlowTemperatureZone1"] = self.round_temperature(value)
             flags |= 0x1000000000000
         elif key == PROPERTY_ZONE_2_TARGET_HEAT_FLOW_TEMPERATURE:
             state["SetHeatFlowTemperatureZone2"] = self.round_temperature(value)
             flags |= 0x1000000000000
-        elif key == PROPERTY_ZONE_2_TARGET_COOL_FLOW_TEMPERATURE:
+        elif key in (
+            PROPERTY_ZONE_2_TARGET_COOL_FLOW_TEMPERATURE,
+            PROPERTY_ZONE_2_TARGET_HEAT_COOL_TEMPERATURE,
+        ):
             state["SetCoolFlowTemperatureZone2"] = self.round_temperature(value)
             flags |= 0x1000000000000
         elif key == PROPERTY_ZONE_1_OPERATION_MODE:
@@ -367,19 +409,129 @@ class AtwDevice(Device):
         return self.get_state_prop("OutdoorTemperature")
 
     @property
+    def flow_temperature(self) -> Optional[float]:
+        """Return current flow temperature of the entire system."""
+        return self.get_device_prop("FlowTemperature")
+
+    @property
+    def return_temperature(self) -> Optional[float]:
+        """Return current return temperature of the entire system."""
+        return self.get_device_prop("ReturnTemperature")
+
+    @property
     def flow_temperature_boiler(self) -> Optional[float]:
         """Return flow temperature of the boiler."""
         return self.get_device_prop("FlowTemperatureBoiler")
 
     @property
     def return_temperature_boiler(self) -> Optional[float]:
-        """Return flow temperature of the boiler."""
-        return self.get_device_prop("FlowTemperatureBoiler")
+        """Return the boiler return temperature."""
+        return self.get_device_prop("ReturnTemperatureBoiler")
 
     @property
     def mixing_tank_temperature(self) -> Optional[float]:
         """Return mixing tank temperature."""
         return self.get_device_prop("MixingTankWaterTemperature")
+
+    @property
+    def condensing_temperature(self) -> Optional[float]:
+        """Return condensing temperature."""
+        return self.get_device_prop("CondensingTemperature")
+
+    @property
+    def heat_pump_frequency(self) -> Optional[int]:
+        """Return current heat pump compressor frequency in Hz."""
+        return self.get_device_prop("HeatPumpFrequency")
+
+    @property
+    def demand_percentage(self) -> Optional[int]:
+        """Return demand percentage (0-100)."""
+        return self.get_state_prop("DemandPercentage")
+
+    @property
+    def boiler_status(self) -> Optional[bool]:
+        """Return boiler status."""
+        return self.get_device_prop("BoilerStatus")
+
+    @property
+    def booster_heater1_status(self) -> Optional[bool]:
+        """Return booster heater 1 status."""
+        return self.get_device_prop("BoosterHeater1Status")
+
+    @property
+    def booster_heater2_status(self) -> Optional[bool]:
+        """Return booster heater 2 status."""
+        return self.get_device_prop("BoosterHeater2Status")
+
+    @property
+    def booster_heater2plus_status(self) -> Optional[bool]:
+        """Return booster heater 2+ status."""
+        return self.get_device_prop("BoosterHeater2PlusStatus")
+
+    @property
+    def immersion_heater_status(self) -> Optional[bool]:
+        """Return immersion heater status."""
+        return self.get_device_prop("ImmersionHeaterStatus")
+
+    @property
+    def water_pump1_status(self) -> Optional[bool]:
+        """Return water pump 1 status."""
+        return self.get_device_prop("WaterPump1Status")
+
+    @property
+    def water_pump2_status(self) -> Optional[bool]:
+        """Return water pump 2 status."""
+        return self.get_device_prop("WaterPump2Status")
+
+    @property
+    def water_pump3_status(self) -> Optional[bool]:
+        """Return water pump 3 status."""
+        return self.get_device_prop("WaterPump3Status")
+
+    @property
+    def water_pump4_status(self) -> Optional[bool]:
+        """Return water pump 4 status."""
+        return self.get_device_prop("WaterPump4Status")
+
+    @property
+    def valve_3way_status(self) -> Optional[bool]:
+        """Return 3-way valve status."""
+        return self.get_device_prop("ValveStatus3Way")
+
+    @property
+    def valve_2way_status(self) -> Optional[bool]:
+        """Return 2-way valve status."""
+        return self.get_device_prop("ValveStatus2Way")
+
+    @property
+    def daily_heating_energy_consumed(self) -> Optional[float]:
+        """Return today's heating energy consumed in kWh."""
+        return self.get_device_prop("DailyHeatingEnergyConsumed")
+
+    @property
+    def daily_cooling_energy_consumed(self) -> Optional[float]:
+        """Return today's cooling energy consumed in kWh."""
+        return self.get_device_prop("DailyCoolingEnergyConsumed")
+
+    @property
+    def daily_hot_water_energy_consumed(self) -> Optional[float]:
+        """Return today's hot water energy consumed in kWh."""
+        return self.get_device_prop("DailyHotWaterEnergyConsumed")
+
+    @property
+    def daily_heating_energy_produced(self) -> Optional[float]:
+        """Return today's heating energy produced in kWh."""
+        return self.get_device_prop("DailyHeatingEnergyProduced")
+
+    @property
+    def daily_cooling_energy_produced(self) -> Optional[float]:
+        """Return today's cooling energy produced in kWh."""
+        return self.get_device_prop("DailyCoolingEnergyProduced")
+
+    @property
+    def daily_hot_water_energy_produced(self) -> Optional[float]:
+        """Return today's hot water energy produced in kWh."""
+        return self.get_device_prop("DailyHotWaterEnergyProduced")
 
     @property
     def zones(self) -> Optional[List[Zone]]:
