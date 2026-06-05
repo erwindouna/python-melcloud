@@ -29,7 +29,7 @@ availability issues.
 
 * Air-to-air heat pumps (DeviceType=0)
 * Air-to-water heat pumps (DeviceType=1)
-* Energy Recovery Ventilators (DeviceType=3) 
+* Energy Recovery Ventilators (DeviceType=3)
 
 ## Read
 
@@ -147,7 +147,7 @@ There's weird behavior associated with the horizontal vane swing.
 Toggling it on will also toggle vertical swing on and the horizontal
 swing has to be disabled before vertical vanes can be adjusted to any
 other position. This behavior can be replicated using the MELCloud user
-inteface.
+interface.
 
 ### Air-to-water heat pump write
 

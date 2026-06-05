@@ -1,0 +1,13 @@
+# serializer version: 1
+# name: test_1zone_snapshot
+  dict({
+    'operation_mode': 'auto',
+    'status': 'heat_zones',
+    'tank_temperature': 52,
+    'target_tank_temperature': 50,
+    'zone_0_operation_mode': 'heat-flow',
+    'zone_0_room_temp': 27,
+    'zone_0_status': 'heat',
+    'zone_0_target_temp': 30,
+  })
+# ---

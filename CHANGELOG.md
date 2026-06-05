@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Boiler flow and mixing tank temperatures for Atw devices.
 
 ### Changed
-- Increate ListDevices poll rate to match the sensor poll rates.
+- Increase ListDevices poll rate to match the sensor poll rates.
 
 ## [2.10.2] - 2021-09-11
 ### Fixed

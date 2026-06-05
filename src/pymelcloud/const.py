@@ -5,13 +5,13 @@ DEVICE_TYPE_ATW = "atw"
 DEVICE_TYPE_ERV = "erv"
 DEVICE_TYPE_UNKNOWN = "unknown"
 
-ACCESS_LEVEL = {
+ACCESS_LEVEL: dict[str, int] = {
     "USER": 2,
     "GUEST": 3,
     "OWNER": 4,
 }
 
-DEVICE_TYPE_LOOKUP = {
+DEVICE_TYPE_LOOKUP: dict[int, str] = {
     0: DEVICE_TYPE_ATA,
     1: DEVICE_TYPE_ATW,
     3: DEVICE_TYPE_ERV,

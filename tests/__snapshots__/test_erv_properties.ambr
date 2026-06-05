@@ -1,0 +1,25 @@
+# serializer version: 1
+# name: test_erv_properties_snapshot
+  dict({
+    'error_code': 8000,
+    'fan_speed': '3',
+    'fan_speeds': list([
+      '1',
+      '2',
+      '3',
+      '4',
+    ]),
+    'has_error': False,
+    'outside_temperature': 28.0,
+    'room_temperature': 29.0,
+    'ventilation_mode': 'recovery',
+    'wifi_signal': -65,
+  })
+# ---
+# name: test_erv_ventilation_modes
+  list([
+    'recovery',
+    'bypass',
+    'auto',
+  ])
+# ---

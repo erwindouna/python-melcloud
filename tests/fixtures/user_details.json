@@ -1,0 +1,10 @@
+{
+  "UseFahrenheit": false,
+  "Language": 0,
+  "EmailOnCommsError": false,
+  "EmailOnError": false,
+  "EmailOnManualReset": false,
+  "EmailOnAdaptorCleaning": false,
+  "EmailOnFrostProtection": false,
+  "EmailOnDefrost": false
+}
