@@ -27,9 +27,9 @@ def test_ata_device_state_from_dict() -> None:
 
 def test_ata_device_state_snapshot(snapshot: SnapshotAssertion) -> None:
     """Snapshot test for AtaDeviceState parsed from fixture."""
-    data = json.loads(load_fixture("ata_get.json"))
-    model = AtaDeviceState.from_dict(data)
-    assert model == snapshot
+    assert (
+        AtaDeviceState.from_dict(json.loads(load_fixture("ata_get.json"))) == snapshot
+    )
 
 
 def test_atw_device_state_from_dict() -> None:
@@ -45,9 +45,10 @@ def test_atw_device_state_from_dict() -> None:
 
 def test_atw_device_state_snapshot(snapshot: SnapshotAssertion) -> None:
     """Snapshot test for AtwDeviceState parsed from fixture."""
-    data = json.loads(load_fixture("atw_1zone_get.json"))
-    model = AtwDeviceState.from_dict(data)
-    assert model == snapshot
+    assert (
+        AtwDeviceState.from_dict(json.loads(load_fixture("atw_1zone_get.json")))
+        == snapshot
+    )
 
 
 def test_erv_device_state_from_dict() -> None:
@@ -63,6 +64,6 @@ def test_erv_device_state_from_dict() -> None:
 
 def test_erv_device_state_snapshot(snapshot: SnapshotAssertion) -> None:
     """Snapshot test for ErvDeviceState parsed from fixture."""
-    data = json.loads(load_fixture("erv_get.json"))
-    model = ErvDeviceState.from_dict(data)
-    assert model == snapshot
+    assert (
+        ErvDeviceState.from_dict(json.loads(load_fixture("erv_get.json"))) == snapshot
+    )
