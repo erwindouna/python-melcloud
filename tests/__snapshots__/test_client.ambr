@@ -1,0 +1,38 @@
+# serializer version: 1
+# name: test_fetch_device_state
+  dict({
+    'DefaultCoolingSetTemperature': 21.0,
+    'DefaultHeatingSetTemperature': 23.0,
+    'DeviceID': 222222,
+    'DeviceType': 0,
+    'EffectiveFlags': 0,
+    'ErrorCode': 8000,
+    'ErrorMessage': None,
+    'HasPendingCommand': False,
+    'HideDryModeControl': False,
+    'HideVaneControls': False,
+    'InStandbyMode': False,
+    'LastCommunication': '2020-07-03T09:03:50.32',
+    'LocalIPAddress': None,
+    'Name': None,
+    'NextCommunication': '2020-07-03T09:04:50.32',
+    'NumberOfFanSpeeds': 5,
+    'Offline': True,
+    'OperationMode': 3,
+    'Power': False,
+    'ProhibitOperationMode': False,
+    'ProhibitPower': False,
+    'ProhibitSetTemperature': False,
+    'RoomTemperature': 28.0,
+    'RoomTemperatureLabel': 0,
+    'Scene': None,
+    'SceneOwner': None,
+    'SetFanSpeed': 3,
+    'SetTemperature': 22.0,
+    'TemperatureIncrementOverride': 0,
+    'VaneHorizontal': 3,
+    'VaneVertical': 0,
+    'WeatherObservations': list([
+    ]),
+  })
+# ---

@@ -1,0 +1,10 @@
+{
+  "LoginData": {
+    "ContextKey": "test-context-key-12345",
+    "Language": 0,
+    "AccountName": "test@example.com",
+    "UseFahrenheit": false
+  },
+  "ErrorId": null,
+  "ErrorMessage": null
+}

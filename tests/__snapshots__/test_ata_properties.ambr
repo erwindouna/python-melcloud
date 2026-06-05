@@ -1,0 +1,32 @@
+# serializer version: 1
+# name: test_ata_operation_modes
+  list([
+    'heat',
+    'dry',
+    'cool',
+    'fan_only',
+    'heat_cool',
+  ])
+# ---
+# name: test_ata_properties_snapshot
+  dict({
+    'error_code': 8000,
+    'fan_speed': '3',
+    'fan_speeds': list([
+      'auto',
+      '1',
+      '2',
+      '3',
+      '4',
+      '5',
+    ]),
+    'has_error': False,
+    'operation_mode': 'cool',
+    'power': False,
+    'room_temperature': 28.0,
+    'target_temperature': 22.0,
+    'vane_horizontal': '3',
+    'vane_vertical': 'auto',
+    'wifi_signal': -51,
+  })
+# ---
