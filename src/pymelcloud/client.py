@@ -42,6 +42,7 @@ async def login(
     email: str,
     password: str,
     session: ClientSession | None = None,
+    request_timeout: float | None = 10.0,
     *,
     user_update_interval: timedelta | None = None,
     conf_update_interval: timedelta | None = None,
@@ -57,7 +58,10 @@ async def login(
         "CaptchaResponse": None,
     }
 
-    if session:
+    if session is None:
+        session = ClientSession()
+
+    async with asyncio.timeout(request_timeout):
         async with session.post(
             str(
                 URL.build(
@@ -70,26 +74,10 @@ async def login(
             raise_for_status=True,
         ) as resp:
             response = await resp.json()
-    else:
-        async with (
-            ClientSession() as _session,
-            _session.post(
-                str(
-                    URL.build(
-                        scheme=_API_SCHEME,
-                        host=_API_HOST,
-                        path=f"{_API_BASE}/Login/ClientLogin",
-                    )
-                ),
-                json=body,
-                raise_for_status=True,
-            ) as resp,
-        ):
-            response = await resp.json()
 
     return Client(
-        response.get("LoginData").get("ContextKey"),
-        session,
+        token=response.get("LoginData").get("ContextKey"),
+        session=session,
         user_update_interval=user_update_interval,
         conf_update_interval=conf_update_interval,
         device_set_debounce=device_set_debounce,

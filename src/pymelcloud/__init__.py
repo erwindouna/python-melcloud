@@ -22,8 +22,8 @@ async def login(
 
     Returns access token.
     """
-    _client = await _login(email, password, session)
-    return _client.token
+    client = await _login(email, password, session)
+    return client.token
 
 
 async def get_devices(
@@ -44,27 +44,27 @@ async def get_devices(
         device_set_debounce -- debounce time for writing device state. (default = 1 s)
 
     """
-    _client = _Client(
+    client = _Client(
         token,
         session,
         conf_update_interval=conf_update_interval,
         device_set_debounce=device_set_debounce,
     )
-    await _client.update_confs()
+    await client.update_confs()
     return {
         DEVICE_TYPE_ATA: [
-            AtaDevice(conf, _client, set_debounce=device_set_debounce)
-            for conf in _client.device_confs
+            AtaDevice(conf, client, set_debounce=device_set_debounce)
+            for conf in client.device_confs
             if conf.get("Device", {}).get("DeviceType") == 0
         ],
         DEVICE_TYPE_ATW: [
-            AtwDevice(conf, _client, set_debounce=device_set_debounce)
-            for conf in _client.device_confs
+            AtwDevice(conf, client, set_debounce=device_set_debounce)
+            for conf in client.device_confs
             if conf.get("Device", {}).get("DeviceType") == 1
         ],
         DEVICE_TYPE_ERV: [
-            ErvDevice(conf, _client, set_debounce=device_set_debounce)
-            for conf in _client.device_confs
+            ErvDevice(conf, client, set_debounce=device_set_debounce)
+            for conf in client.device_confs
             if conf.get("Device", {}).get("DeviceType") == 3
         ],
     }
